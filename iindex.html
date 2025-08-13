@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Data Collection Form</title>
+</head>
+<body>
+  <h2>Data Collection Form</h2>
+
+  <form id="dataForm">
+    <label>Email:</label><br>
+    <input type="email" name="email" required><br><br>
+
+    <label>Location:</label><br>
+    <button type="button" onclick="getLocation()">Get Location</button><br>
+    <input type="text" name="latitude" placeholder="Latitude" readonly required>
+    <input type="text" name="longitude" placeholder="Longitude" readonly required><br><br>
+
+    <label>Photo 1:</label>
+    <input type="file" name="photo1" accept="image/*" required><br><br>
+
+    <label>Photo 2:</label>
+    <input type="file" name="photo2" accept="image/*" required><br><br>
+
+    <label>Choice:</label>
+    <select name="choice">
+      <option value="Yes">Yes</option>
+      <option value="No">No</option>
+    </select><br><br>
+
+    <label>Remark:</label><br>
+    <textarea name="remark"></textarea><br><br>
+
+    <button type="submit">Submit</button>
+  </form>
+
+  <script>
+    const scriptURL = "YOUR_APPS_SCRIPT_WEB_APP_URL"; // <-- Apps Script ka URL yahan dalna
+
+    function getLocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+          document.querySelector('[name="latitude"]').value = position.coords.latitude;
+          document.querySelector('[name="longitude"]').value = position.coords.longitude;
+        });
+      } else {
+        alert("Geolocation is not supported by this browser.");
+      }
+    }
+
+    function compressImage(file, maxSizeKB, callback) {
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          const scaleFactor = Math.sqrt((maxSizeKB * 1024) / file.size);
+          canvas.width = img.width * scaleFactor;
+          canvas.height = img.height * scaleFactor;
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          canvas.toBlob(function(blob) {
+            callback(blob);
+          }, 'image/jpeg', 0.8);
+        };
+        img.src = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    document.getElementById("dataForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const formData = new FormData(e.target);
+      const photos = [];
+
+      const processPhoto = (file, index, callback) => {
+        compressImage(file, 200, function(blob) {
+          const reader = new FileReader();
+          reader.onloadend = function() {
+            const base64 = reader.result.split(',')[1];
+            photos[index] = {
+              name: file.name,
+              ext: file.name.split('.').pop(),
+              type: file.type,
+              data: base64
+            };
+            callback();
+          };
+          reader.readAsDataURL(blob);
+        });
+      };
+
+      processPhoto(formData.get("photo1"), 0, () => {
+        processPhoto(formData.get("photo2"), 1, () => {
+          const data = {
+            email: formData.get("email"),
+            latitude: formData.get("latitude"),
+            longitude: formData.get("longitude"),
+            choice: formData.get("choice"),
+            remark: formData.get("remark"),
+            photos: photos
+          };
+
+          fetch(scriptURL, {
+            method: "POST",
+            body: JSON.stringify(data)
+          })
+          .then(res => res.json())
+          .then(res => {
+            if (res.status === "success") {
+              alert("Data submitted successfully!");
+              e.target.reset();
+            } else {
+              alert("Error: " + res.message);
+            }
+          })
+          .catch(err => alert("Error: " + err));
+        });
+      });
+    });
+  </script>
+</body>
+</html>
