@@ -146,29 +146,31 @@
     }
 
     // ====== LOCATION ======
-    function getLocation() {
-      const locStatus = document.getElementById("locStatus");
-      if (!navigator.geolocation) {
-        locStatus.textContent = "Geolocation not supported by this browser.";
-        locStatus.className = "error";
-        return;
-      }
-      locStatus.textContent = "Fetching location...";
-      navigator.geolocation.getCurrentPosition(
-        pos => {
-          document.querySelector("[name=latitude]").value = pos.coords.latitude;
-          document.querySelector("[name=longitude]").value = pos.coords.longitude;
-          locStatus.textContent = "Location captured ✓";
-          locStatus.className = "muted ok";
-        },
-        err => {
-          locStatus.textContent = "Location capture failed";
-          locStatus.className = "error";
-          alert("Failed to get location: " + err.message);
-        },
-        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-      );
-    }
+    // ====== LOCATION ======
+function getLocation() {
+  const locStatus = document.getElementById("locStatus");
+  if (!navigator.geolocation) {
+    locStatus.textContent = "Geolocation not supported by this browser.";
+    locStatus.className = "error";
+    return;
+  }
+  locStatus.textContent = "Fetching location...";
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      document.querySelector("[name=latitude]").value = pos.coords.latitude;
+      document.querySelector("[name=longitude]").value = pos.coords.longitude;
+      locStatus.textContent = `Location captured ✓ (Accuracy: ${pos.coords.accuracy}m)`;
+      locStatus.className = "muted ok";
+    },
+    err => {
+      locStatus.textContent = "Location capture failed";
+      locStatus.className = "error";
+      alert("Failed to get location: " + err.message);
+    },
+    { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+  );
+}
+
 
     // ====== IMAGE COMPRESSION (target ~200KB) ======
     function compressImageToDataURL(file, maxKB = 200) {
