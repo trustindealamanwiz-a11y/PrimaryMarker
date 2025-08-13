@@ -34,7 +34,7 @@
   </form>
 
   <script>
-    const scriptURL = "YOUR_APPS_SCRIPT_WEB_APP_URL"; // <-- Apps Script ka URL yahan dalna
+    const scriptURL = "https://script.google.com/macros/s/AKfycbyb0CI0mL5nkHmLjYm_AYwgZyhcmefGGJ85NAvsLrbQGLa-oaoy0no_q0A9Ky-PIqh6kw/exec"; // <-- paste backend URL here
 
     function getLocation() {
       if (navigator.geolocation) {
@@ -43,7 +43,7 @@
           document.querySelector('[name="longitude"]').value = position.coords.longitude;
         });
       } else {
-        alert("Geolocation is not supported by this browser.");
+        alert("Geolocation not supported.");
       }
     }
 
@@ -103,7 +103,8 @@
 
           fetch(scriptURL, {
             method: "POST",
-            body: JSON.stringify(data)
+            body: JSON.stringify(data),
+            headers: { "Content-Type": "application/json" }
           })
           .then(res => res.json())
           .then(res => {
