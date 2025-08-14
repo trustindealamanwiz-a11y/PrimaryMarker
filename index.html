@@ -27,10 +27,6 @@
   <!-- Sign-in card -->
   <div id="signinCard" class="card">
     <div class="row">
-      <div id="g_id_onload"
-           data-client_id="599836800018-6df1f03d2l70q5aoncd0s3b99j72je38.apps.googleusercontent.com"
-           data-callback="handleCredentialResponse">
-      </div>
       <div id="signinBtn"></div>
     </div>
     <div id="accessMsg" class="row muted">
@@ -93,13 +89,13 @@
     // ====== CONFIG ======
     const allowedEmails = ["shahzebahmad2024@gmail.com", "trustindeal.amanwiz@gmail.com"];
     const scriptURL = "https://script.google.com/macros/s/AKfycbyb0CI0mL5nkHmLjYm_AYwgZyhcmefGGJ85NAvsLrbQGLa-oaoy0no_q0A9Ky-PIqh6kw/exec";
+    const clientID = "599836800018-6df1f03d2l70q5aoncd0s3b99j72je38.apps.googleusercontent.com";
 
     // ====== GOOGLE SIGN-IN ======
     window.onload = () => {
-      // Render the Google Sign-In button
       if (window.google && google.accounts && google.accounts.id) {
         google.accounts.id.initialize({
-          client_id: "599836800018-6df1f03d2l70q5aoncd0s3b99j72je38.apps.googleusercontent.com",
+          client_id: clientID,
           callback: handleCredentialResponse
         });
         google.accounts.id.renderButton(
@@ -133,14 +129,12 @@
       const whoami = document.getElementById("whoami");
 
       if (allowedEmails.includes(email)) {
-        // allow
         document.querySelector('[name="email"]').value = email;
-        whoami.innerHTML = Signed in as <b>${email}</b> — access granted.;
+        whoami.innerHTML = `Signed in as <b>${email}</b> — access granted.`;
         deniedMsg.classList.add("hidden");
         signinCard.classList.add("hidden");
         formCard.classList.remove("hidden");
       } else {
-        // deny
         deniedMsg.classList.remove("hidden");
       }
     }
@@ -182,13 +176,11 @@
             const canvas = document.createElement("canvas");
             const ctx = canvas.getContext("2d");
 
-            // initial downscale by area ratio vs size as a heuristic
             const scale = Math.min(1, Math.sqrt((maxKB * 1024) / (file.size || (img.width * img.height))));
             canvas.width = Math.max(1, Math.round(img.width * scale));
             canvas.height = Math.max(1, Math.round(img.height * scale));
             ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-            // quality loop
             let quality = 0.75;
             let dataUrl = canvas.toDataURL("image/jpeg", quality);
             while (dataUrl.length / 1024 > maxKB && quality > 0.2) {
@@ -239,7 +231,6 @@
       submitStatus.textContent = "Submitting...";
       fetch(scriptURL, {
         method: "POST",
-        // Use text/plain to avoid CORS preflight with Apps Script
         headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify(payload)
       })
@@ -248,8 +239,7 @@
         if (resp.status === "success") {
           submitStatus.textContent = "Submitted ✓";
           form.reset();
-          // keep the email intact for convenience
-          document.querySelector('[name="email"]').value = document.getElementById("whoami").textContent.match(/Signed in as <b>(.*?)<\/b>/)?.[1] || "";
+          document.querySelector('[name="email"]').value = payload.email;
           document.getElementById("locStatus").textContent = "Location not captured";
           document.getElementById("locStatus").className = "muted";
           alert("Data submitted successfully!");
