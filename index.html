@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <title>Secure Data Form</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <!-- Google Identity Services -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <style>
     body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; max-width: 720px; margin: 24px auto; padding: 0 16px; }
@@ -52,6 +51,12 @@
       <div class="row" style="display:flex; gap:8px;">
         <input type="text" name="latitude" placeholder="Latitude" readonly required />
         <input type="text" name="longitude" placeholder="Longitude" readonly required />
+      </div>
+
+      <!-- Manual location link fallback -->
+      <div class="row hidden" id="manualLocRow">
+        <label>Location Link (Google Maps)</label>
+        <input type="text" name="locationLink" placeholder="Paste Google Maps link here" />
       </div>
 
       <div class="row">
@@ -139,26 +144,44 @@
       }
     }
 
-    // ====== LOCATION ======
+    // ====== LOCATION with manual fallback ======
     function getLocation() {
       const locStatus = document.getElementById("locStatus");
+      const latInput = document.querySelector("[name=latitude]");
+      const lonInput = document.querySelector("[name=longitude]");
+      const manualLocRow = document.getElementById("manualLocRow");
+      const locationLinkInput = document.querySelector("[name=locationLink]");
+
+      // reset state
+      manualLocRow.classList.add("hidden");
+      locationLinkInput.required = false;
+      latInput.value = "";
+      lonInput.value = "";
+
       if (!navigator.geolocation) {
-        locStatus.textContent = "Geolocation not supported by this browser.";
+        locStatus.textContent = "Geolocation not supported — please paste a location link.";
         locStatus.className = "error";
+        manualLocRow.classList.remove("hidden");
+        locationLinkInput.required = true;
         return;
       }
+
       locStatus.textContent = "Fetching location...";
       navigator.geolocation.getCurrentPosition(
         pos => {
-          document.querySelector("[name=latitude]").value = pos.coords.latitude;
-          document.querySelector("[name=longitude]").value = pos.coords.longitude;
+          latInput.value = pos.coords.latitude;
+          lonInput.value = pos.coords.longitude;
           locStatus.textContent = "Location captured ✓";
           locStatus.className = "muted ok";
+          manualLocRow.classList.add("hidden");
+          locationLinkInput.required = false;
         },
         err => {
-          locStatus.textContent = "Location capture failed";
+          locStatus.textContent = "GPS failed — please paste a location link.";
           locStatus.className = "error";
-          alert("Failed to get location: " + err.message);
+          manualLocRow.classList.remove("hidden");
+          locationLinkInput.required = true;
+          alert("Please paste your location link manually.");
         },
         { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
       );
@@ -223,6 +246,7 @@
         email: form.email.value,
         latitude: form.latitude.value,
         longitude: form.longitude.value,
+        locationLink: form.locationLink.value || "",
         photos,
         choice: form.choice.value,
         remark: form.remark.value
@@ -242,6 +266,7 @@
           document.querySelector('[name="email"]').value = payload.email;
           document.getElementById("locStatus").textContent = "Location not captured";
           document.getElementById("locStatus").className = "muted";
+          document.getElementById("manualLocRow").classList.add("hidden");
           alert("Data submitted successfully!");
         } else {
           submitStatus.textContent = "";
