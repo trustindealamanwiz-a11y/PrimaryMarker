@@ -1,152 +1,160 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Data Submission Form</title>
+  <meta charset="UTF-8">
+  <title>Secure Data Form</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
-    h1 { text-align: center; }
-    form { background: #fff; padding: 20px; border-radius: 8px; max-width: 600px; margin: auto; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-    label { font-weight: bold; margin-top: 10px; display: block; }
-    input, textarea, select { width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box; }
-    button { margin-top: 15px; padding: 10px; background: #28a745; color: white; border: none; cursor: pointer; border-radius: 4px; }
-    button:hover { background: #218838; }
-    #submitStatus { text-align: center; margin-top: 15px; }
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 400px;
+      margin: auto;
+      padding: 10px;
+      background: #f8f8f8;
+    }
+    form {
+      background: #fff;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    input, textarea {
+      width: 100%;
+      padding: 8px;
+      margin: 6px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      background: #007bff;
+      color: #fff;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      width: 100%;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    #submitStatus {
+      margin-top: 8px;
+      font-size: 14px;
+      color: green;
+    }
   </style>
 </head>
 <body>
-  <h1>Data Submission Form</h1>
-  <form id="dataForm">
-    <label>Email:</label>
-    <input type="email" name="email" required>
 
-    <label>Location Link (optional):</label>
-    <input type="text" name="locationLink" placeholder="Paste Google Maps link or leave blank">
+<h2>Data Form</h2>
+<form id="dataForm">
+  <input type="email" name="email" placeholder="Email" required>
+  <input type="url" name="locationLink" placeholder="Google Maps Link (optional)">
+  <input type="file" name="photo1" accept="image/*" required>
+  <input type="file" name="photo2" accept="image/*">
+  <input type="text" name="jcName" placeholder="JC Name">
+  <input type="text" name="splitter" placeholder="Splitter">
+  <input type="text" name="wire" placeholder="Wire">
+  <input type="text" name="wireColor" placeholder="Wire Color">
+  <input type="text" name="lineName" placeholder="Line Name">
+  <input type="text" name="drumNo" placeholder="Drum No">
+  <textarea name="remark" placeholder="Remark"></textarea>
+  <button type="submit">Submit</button>
+  <div id="submitStatus"></div>
+</form>
 
-    <label>Photo 1:</label>
-    <input type="file" name="photo1" accept="image/*" required>
+<script>
+async function compressImageToDataURL(file, maxSizeKB) {
+  if (!file) return "";
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        const scale = Math.sqrt((maxSizeKB * 1024) / file.size);
+        canvas.width = img.width * scale;
+        canvas.height = img.height * scale;
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        resolve(canvas.toDataURL("image/jpeg", 0.7));
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
 
-    <label>Photo 2:</label>
-    <input type="file" name="photo2" accept="image/*" required>
+async function onSubmit(e) {
+  e.preventDefault();
+  const form = e.target;
+  const submitStatus = document.getElementById("submitStatus");
+  submitStatus.textContent = "Compressing images...";
 
-    <label>JC Name:</label>
-    <input type="text" name="jcName">
+  const photos = [];
+  try {
+    photos.push(await compressImageToDataURL(form.photo1.files[0], 200));
+    photos.push(await compressImageToDataURL(form.photo2.files[0], 200));
+  } catch (err) {
+    alert("Image processing failed: " + err.message);
+    return;
+  }
 
-    <label>Splitter:</label>
-    <input type="text" name="splitter">
+  const payload = {
+    email: form.email.value,
+    locationLink: form.locationLink ? form.locationLink.value : "",
+    photo1: photos[0],
+    photo2: photos[1],
+    jcName: form.jcName.value,
+    splitter: form.splitter.value,
+    wire: form.wire.value,
+    wireColor: form.wireColor.value,
+    lineName: form.lineName.value,
+    drumNo: form.drumNo.value,
+    remark: form.remark.value
+  };
 
-    <label>Wire:</label>
-    <input type="text" name="wire">
+  submitStatus.textContent = "Submitting...";
 
-    <label>Wire Color:</label>
-    <input type="text" name="wireColor">
+  const scriptURL = "https://script.google.com/macros/s/AKfycbyb0CI0mL5nkHmLjYm_AYwgZyhcmefGGJ85NAvsLrbQGLa-oaoy0no_q0A9Ky-PIqh6kw/exec";
 
-    <label>Line Name:</label>
-    <input type="text" name="lineName">
+  try {
+    const response = await fetch(scriptURL, {
+      method: "POST",
+      body: JSON.stringify(payload),
+      headers: { "Content-Type": "application/json" }
+    });
 
-    <label>Drum No:</label>
-    <input type="text" name="drumNo">
+    console.log("Fetch status:", response.status, response.statusText);
+    const respText = await response.text();
+    console.log("Raw response:", respText);
 
-    <label>Remark:</label>
-    <textarea name="remark"></textarea>
-
-    <button type="submit">Submit</button>
-    <p id="submitStatus"></p>
-  </form>
-
-  <script>
-    const scriptURL = "https://script.google.com/macros/s/AKfycbyb0CI0mL5nkHmLjYm_AYwgZyhcmefGGJ85NAvsLrbQGLa-oaoy0no_q0A9Ky-PIqh6kw/exec";
-
-    async function compressImageToDataURL(file, maxSizeKB) {
-      return new Promise((resolve, reject) => {
-        if (!file) return reject(new Error("No file selected"));
-        const reader = new FileReader();
-        reader.onload = event => {
-          const img = new Image();
-          img.onload = () => {
-            const canvas = document.createElement("canvas");
-            const ctx = canvas.getContext("2d");
-            let width = img.width;
-            let height = img.height;
-            const maxDim = 1024;
-            if (width > height && width > maxDim) {
-              height *= maxDim / width;
-              width = maxDim;
-            } else if (height > maxDim) {
-              width *= maxDim / height;
-              height = maxDim;
-            }
-            canvas.width = width;
-            canvas.height = height;
-            ctx.drawImage(img, 0, 0, width, height);
-            let quality = 0.9;
-            let dataUrl = canvas.toDataURL("image/jpeg", quality);
-            while (dataUrl.length / 1024 > maxSizeKB && quality > 0.1) {
-              quality -= 0.05;
-              dataUrl = canvas.toDataURL("image/jpeg", quality);
-            }
-            resolve(dataUrl);
-          };
-          img.onerror = err => reject(err);
-          img.src = event.target.result;
-        };
-        reader.onerror = err => reject(err);
-        reader.readAsDataURL(file);
-      });
+    let resp;
+    try {
+      resp = JSON.parse(respText);
+    } catch (parseErr) {
+      throw new Error("Invalid JSON from server: " + respText);
     }
 
-    document.getElementById("dataForm").addEventListener("submit", async function(e) {
-      e.preventDefault();
-      const form = e.target;
-      const submitStatus = document.getElementById("submitStatus");
-      submitStatus.textContent = "Compressing images...";
+    if (resp.status === "success") {
+      submitStatus.textContent = "Submitted ✓";
+      form.reset();
+      alert("Data submitted successfully!");
+    } else {
+      submitStatus.textContent = "";
+      alert("Error from server: " + (resp.message || "Unknown error"));
+    }
+  } catch (err) {
+    submitStatus.textContent = "";
+    console.error("Fetch failed:", err);
+    alert("Network error: " + err.message + "\nCheck console for details.");
+  }
+}
 
-      let photos = [];
-      try {
-        photos.push(await compressImageToDataURL(form.photo1.files[0], 200));
-        photos.push(await compressImageToDataURL(form.photo2.files[0], 200));
-      } catch (err) {
-        alert("Image processing failed: " + err.message);
-        return;
-      }
+document.getElementById("dataForm").addEventListener("submit", onSubmit);
+</script>
 
-      const payload = {
-        email: form.email.value,
-        locationLink: form.locationLink.value || "",
-        photo1: photos[0],
-        photo2: photos[1],
-        jcName: form.jcName.value,
-        splitter: form.splitter.value,
-        wire: form.wire.value,
-        wireColor: form.wireColor.value,
-        lineName: form.lineName.value,
-        drumNo: form.drumNo.value,
-        remark: form.remark.value
-      };
-
-      submitStatus.textContent = "Submitting...";
-      fetch(scriptURL, {
-        method: "POST",
-        body: JSON.stringify(payload),
-        headers: { "Content-Type": "application/json" }
-      })
-      .then(r => r.json())
-      .then(resp => {
-        if (resp.status === "success") {
-          submitStatus.textContent = "Submitted ✓";
-          form.reset();
-          alert("Data submitted successfully!");
-        } else {
-          submitStatus.textContent = "";
-          alert("Error from server: " + (resp.message || "Unknown error"));
-        }
-      })
-      .catch(err => {
-        submitStatus.textContent = "";
-        alert("Network error: " + err.message);
-      });
-    });
-  </script>
 </body>
 </html>
