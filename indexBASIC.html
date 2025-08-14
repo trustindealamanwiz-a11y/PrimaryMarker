@@ -1,74 +1,225 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Data Submission Form</title>
+  <meta charset="UTF-8" />
+  <title>Secure Data Form</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Google Identity Services -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; max-width: 720px; margin: 24px auto; padding: 0 16px; }
+    h2 { margin-top: 0; }
+    .card { border: 1px solid #ddd; border-radius: 12px; padding: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+    .row { margin: 10px 0; }
+    input, select, textarea, button { font-size: 16px; padding: 8px; }
+    input[type="text"], input[type="email"], select, textarea { width: 100%; box-sizing: border-box; }
+    textarea { min-height: 90px; }
+    .hidden { display: none; }
+    .muted { color: #666; font-size: 14px; }
+    .error { color: #c00; margin-top: 8px; }
+    .ok { color: #0a0; }
+    .actions { display: flex; gap: 8px; align-items: center; }
+  </style>
 </head>
 <body>
-  <h2>Submit Your Data</h2>
-  <form id="dataForm">
-    Email: <input type="email" name="email" required><br><br>
-    <button type="button" onclick="getLocation()">Get Location</button><br>
-    <input type="text" name="latitude" placeholder="Latitude" readonly required>
-    <input type="text" name="longitude" placeholder="Longitude" readonly required><br><br>
-    Photo 1: <input type="file" name="photo1" accept="image/*" required><br>
-    Photo 2: <input type="file" name="photo2" accept="image/*"><br><br>
-    Choice:
-    <select name="choice" required>
-      <option value="">--Select--</option>
-      <option value="Yes">Yes</option>
-      <option value="No">No</option>
-    </select><br><br>
-    Remark:<br>
-    <textarea name="remark"></textarea><br><br>
-    <button type="submit">Submit</button>
-  </form>
+  <h2>Secure Data Form</h2>
+
+  <!-- Sign-in card -->
+  <div id="signinCard" class="card">
+    <div class="row">
+      <div id="signinBtn"></div>
+    </div>
+    <div id="accessMsg" class="row muted">
+      Sign in with Google. Only allowed emails can access the form.
+    </div>
+    <div id="deniedMsg" class="row error hidden">Access denied — your email is not allowed.</div>
+  </div>
+
+  <!-- Form card -->
+  <div id="formCard" class="card hidden">
+    <div class="row muted" id="whoami"></div>
+    <form id="dataForm">
+      <div class="row">
+        <label>Email</label>
+        <input type="email" name="email" readonly required />
+      </div>
+
+      <div class="row actions">
+        <button type="button" id="locBtn">Get Location</button>
+        <span id="locStatus" class="muted">Location not captured</span>
+      </div>
+
+      <div class="row" style="display:flex; gap:8px;">
+        <input type="text" name="latitude" placeholder="Latitude" readonly required />
+        <input type="text" name="longitude" placeholder="Longitude" readonly required />
+      </div>
+
+      <div class="row">
+        <label>Photo 1 (required)</label>
+        <input type="file" name="photo1" accept="image/*" required />
+      </div>
+
+      <div class="row">
+        <label>Photo 2 (optional)</label>
+        <input type="file" name="photo2" accept="image/*" />
+      </div>
+
+      <div class="row">
+        <label>Choice</label>
+        <select name="choice" required>
+          <option value="">-- Select --</option>
+          <option value="Yes">Yes</option>
+          <option value="No">No</option>
+        </select>
+      </div>
+
+      <div class="row">
+        <label>Remark</label>
+        <textarea name="remark" placeholder="Write remarks..."></textarea>
+      </div>
+
+      <div class="row actions">
+        <button type="submit">Submit</button>
+        <span id="submitStatus" class="muted"></span>
+      </div>
+    </form>
+  </div>
 
   <script>
+    // ====== CONFIG ======
+    const allowedEmails = ["shahzebahmad2024@gmail.com", "trustindeal.amanwiz@gmail.com"];
     const scriptURL = "https://script.google.com/macros/s/AKfycbyb0CI0mL5nkHmLjYm_AYwgZyhcmefGGJ85NAvsLrbQGLa-oaoy0no_q0A9Ky-PIqh6kw/exec";
+    const clientID = "599836800018-6df1f03d2l70q5aoncd0s3b99j72je38.apps.googleusercontent.com";
 
+    // ====== GOOGLE SIGN-IN ======
+    window.onload = () => {
+      if (window.google && google.accounts && google.accounts.id) {
+        google.accounts.id.initialize({
+          client_id: clientID,
+          callback: handleCredentialResponse
+        });
+        google.accounts.id.renderButton(
+          document.getElementById("signinBtn"),
+          { theme: "outline", size: "large", type: "standard", shape: "pill" }
+        );
+      }
+      document.getElementById("locBtn").addEventListener("click", getLocation);
+      document.getElementById("dataForm").addEventListener("submit", onSubmit);
+    };
+
+    function parseJwt(token) {
+      try {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(atob(base64).split('').map(c =>
+          '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+        ).join(''));
+        return JSON.parse(jsonPayload);
+      } catch {
+        return {};
+      }
+    }
+
+    function handleCredentialResponse(response) {
+      const payload = parseJwt(response.credential);
+      const email = payload.email || "";
+      const formCard = document.getElementById("formCard");
+      const signinCard = document.getElementById("signinCard");
+      const deniedMsg = document.getElementById("deniedMsg");
+      const whoami = document.getElementById("whoami");
+
+      if (allowedEmails.includes(email)) {
+        document.querySelector('[name="email"]').value = email;
+        whoami.innerHTML = `Signed in as <b>${email}</b> — access granted.`;
+        deniedMsg.classList.add("hidden");
+        signinCard.classList.add("hidden");
+        formCard.classList.remove("hidden");
+      } else {
+        deniedMsg.classList.remove("hidden");
+      }
+    }
+
+    // ====== LOCATION ======
     function getLocation() {
-      navigator.geolocation.getCurrentPosition(position => {
-        document.querySelector("[name=latitude]").value = position.coords.latitude;
-        document.querySelector("[name=longitude]").value = position.coords.longitude;
-      }, () => alert("Failed to get location"));
+      const locStatus = document.getElementById("locStatus");
+      if (!navigator.geolocation) {
+        locStatus.textContent = "Geolocation not supported by this browser.";
+        locStatus.className = "error";
+        return;
+      }
+      locStatus.textContent = "Fetching location...";
+      navigator.geolocation.getCurrentPosition(
+        pos => {
+          document.querySelector("[name=latitude]").value = pos.coords.latitude;
+          document.querySelector("[name=longitude]").value = pos.coords.longitude;
+          locStatus.textContent = "Location captured ✓";
+          locStatus.className = "muted ok";
+        },
+        err => {
+          locStatus.textContent = "Location capture failed";
+          locStatus.className = "error";
+          alert("Failed to get location: " + err.message);
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      );
     }
 
-    function compressImage(file, maxSizeKB, callback) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const img = new Image();
-        img.src = reader.result;
-        img.onload = () => {
-          const canvas = document.createElement("canvas");
-          const ctx = canvas.getContext("2d");
-          const scale = Math.min(1, Math.sqrt((maxSizeKB * 1024) / file.size));
-          canvas.width = img.width * scale;
-          canvas.height = img.height * scale;
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-          let quality = 0.7;
-          let dataUrl = canvas.toDataURL("image/jpeg", quality);
-          while (dataUrl.length / 1024 > maxSizeKB && quality > 0.1) {
-            quality -= 0.05;
-            dataUrl = canvas.toDataURL("image/jpeg", quality);
-          }
-          callback(dataUrl);
+    // ====== IMAGE COMPRESSION (target ~200KB) ======
+    function compressImageToDataURL(file, maxKB = 200) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onerror = () => reject(new Error("Failed to read file"));
+        reader.onload = () => {
+          const img = new Image();
+          img.onerror = () => reject(new Error("Invalid image"));
+          img.onload = () => {
+            const canvas = document.createElement("canvas");
+            const ctx = canvas.getContext("2d");
+
+            const scale = Math.min(1, Math.sqrt((maxKB * 1024) / (file.size || (img.width * img.height))));
+            canvas.width = Math.max(1, Math.round(img.width * scale));
+            canvas.height = Math.max(1, Math.round(img.height * scale));
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+            let quality = 0.75;
+            let dataUrl = canvas.toDataURL("image/jpeg", quality);
+            while (dataUrl.length / 1024 > maxKB && quality > 0.2) {
+              quality -= 0.05;
+              dataUrl = canvas.toDataURL("image/jpeg", quality);
+            }
+            resolve(dataUrl);
+          };
+          img.src = reader.result;
         };
-      };
-      reader.readAsDataURL(file);
+        reader.readAsDataURL(file);
+      });
     }
 
-    document.getElementById("dataForm").addEventListener("submit", async function(e) {
+    // ====== SUBMIT ======
+    async function onSubmit(e) {
       e.preventDefault();
       const form = e.target;
-      const photos = [];
+      const submitStatus = document.getElementById("submitStatus");
+      submitStatus.textContent = "Compressing images...";
 
-      await new Promise(res => compressImage(form.photo1.files[0], 200, dataUrl => { photos.push(dataUrl); res(); }));
-      if (form.photo2.files[0]) {
-        await new Promise(res => compressImage(form.photo2.files[0], 200, dataUrl => { photos.push(dataUrl); res(); }));
+      const photos = [];
+      const p1 = form.photo1.files[0];
+      const p2 = form.photo2.files[0];
+
+      if (!p1) {
+        alert("Photo 1 is required.");
+        return;
       }
 
-      const data = {
+      try {
+        photos.push(await compressImageToDataURL(p1, 200));
+        if (p2) photos.push(await compressImageToDataURL(p2, 200));
+      } catch (err) {
+        alert("Image processing failed: " + err.message);
+        return;
+      }
+
+      const payload = {
         email: form.email.value,
         latitude: form.latitude.value,
         longitude: form.longitude.value,
@@ -77,23 +228,31 @@
         remark: form.remark.value
       };
 
+      submitStatus.textContent = "Submitting...";
       fetch(scriptURL, {
         method: "POST",
         headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify(data),
-        redirect: "follow"
+        body: JSON.stringify(payload)
       })
-      .then(res => res.json())
+      .then(r => r.json())
       .then(resp => {
         if (resp.status === "success") {
-          alert("Successfully submitted!");
+          submitStatus.textContent = "Submitted ✓";
           form.reset();
+          document.querySelector('[name="email"]').value = payload.email;
+          document.getElementById("locStatus").textContent = "Location not captured";
+          document.getElementById("locStatus").className = "muted";
+          alert("Data submitted successfully!");
         } else {
-          alert("Error: " + resp.message);
+          submitStatus.textContent = "";
+          alert("Error from server: " + (resp.message || "Unknown error"));
         }
       })
-      .catch(err => alert("Network error: " + err));
-    });
+      .catch(err => {
+        submitStatus.textContent = "";
+        alert("Network error: " + err);
+      });
+    }
   </script>
 </body>
 </html>
