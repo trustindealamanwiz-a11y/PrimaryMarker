@@ -2,216 +2,133 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Tag Splitter</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Primary Marker Submission</title>
   <style>
-    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; max-width: 720px; margin: 24px auto; padding: 0 16px; }
-    h2 { margin-top: 0; }
-    .card { border: 1px solid #ddd; border-radius: 12px; padding: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
-    .row { margin: 8px 0; }
-    input, select, textarea, button { font-size: 16px; padding: 8px; border-radius: 6px; border: 1px solid #ccc; }
-    input[type="text"], input[type="email"], select, textarea { width: 100%; box-sizing: border-box; }
-    textarea { min-height: 80px; }
-    .hidden { display: none; }
-    .muted { color: #666; font-size: 14px; }
-    .error { color: #c00; margin-top: 4px; }
-    .ok { color: #0a0; }
-    .actions { display: flex; gap: 8px; align-items: center; }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    form {
+      max-width: 600px;
+      margin: auto;
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+    }
+    input, textarea, select, button {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+    }
+    #submitStatus {
+      margin-top: 15px;
+      font-weight: bold;
+      color: green;
+    }
   </style>
 </head>
 <body>
-  <h2>Tag Splitter</h2>
 
-  <!-- Sign-in card -->
-  <div id="signinCard" class="card">
-    <div class="row">
-      <div id="signinBtn"></div>
-    </div>
-    <div id="accessMsg" class="row muted">
-      Please contact Admin if your ID is not registered!
-    </div>
-    <div id="deniedMsg" class="row error hidden">Access denied — your email is not allowed.</div>
-  </div>
+  <h1>Primary Marker Submission</h1>
+  <form id="markerForm">
+    <label>Email:
+      <input type="email" name="email" required>
+    </label>
 
-  <!-- Form card -->
-  <div id="formCard" class="card hidden">
-    <div class="row muted" id="whoami"></div>
-    <form id="dataForm">
-      <input type="email" name="email" hidden required />
+    <label>Location Link:
+      <input type="text" name="locationLink" placeholder="Paste Google Maps link here">
+    </label>
 
-      <div class="row hidden" id="locationRow">
-        <input type="text" name="locationLink" placeholder="Paste Google Maps location link" required />
-      </div>
+    <label>JC Name:
+      <input type="text" name="jcName">
+    </label>
 
-      <div class="row">
-        <input type="file" name="photo1" accept="image/*" capture="environment" placeholder="JC Photo" required />
-      </div>
-      <div class="row">
-        <input type="file" name="photo2" accept="image/*" capture="environment" placeholder="Area Photo" required />
-      </div>
+    <label>Splitter:
+      <input type="text" name="splitter">
+    </label>
 
-      <div class="row">
-        <input type="text" name="jcName" placeholder="JC Name" required />
-      </div>
+    <label>Wire:
+      <input type="text" name="wire">
+    </label>
 
-      <div class="row">
-        <select name="splitter" required>
-          <option value="">Select Splitter</option>
-          <option>2 way</option>
-          <option>4 way</option>
-          <option>8 way</option>
-          <option>16 way</option>
-        </select>
-      </div>
+    <label>Wire Color:
+      <input type="text" name="wireColor">
+    </label>
 
-      <div class="row">
-        <select name="wire" required>
-          <option value="">Select Wire</option>
-          <option>1 core</option>
-          <option>2 core</option>
-          <option>4 core</option>
-          <option>6 core</option>
-          <option>12 core</option>
-          <option>24 core</option>
-          <option>48 core</option>
-          <option>96 core</option>
-        </select>
-      </div>
+    <label>Line Name:
+      <input type="text" name="lineName">
+    </label>
 
-      <div class="row">
-        <select name="wireColor" required>
-          <option value="">Wire Color</option>
-          <option>Black</option>
-          <option>Orange</option>
-          <option>Other</option>
-        </select>
-      </div>
+    <label>Drum No:
+      <input type="text" name="drumNo">
+    </label>
 
-      <div class="row">
-        <input type="text" name="lineName" placeholder="Line Name (optional)" />
-      </div>
+    <label>Remark:
+      <textarea name="remark"></textarea>
+    </label>
 
-      <div class="row">
-        <input type="text" name="drumNo" placeholder="Drum No (optional)" />
-      </div>
+    <label>Photo 1:
+      <input type="file" name="photo1" accept="image/*" capture="camera" required>
+    </label>
 
-      <div class="row">
-        <textarea name="remark" placeholder="Remarks..."></textarea>
-      </div>
+    <label>Photo 2:
+      <input type="file" name="photo2" accept="image/*" capture="camera">
+    </label>
 
-      <div class="row actions">
-        <button type="submit">Submit</button>
-        <span id="submitStatus" class="muted"></span>
-      </div>
-    </form>
-  </div>
+    <button type="submit">Submit</button>
+    <div id="submitStatus"></div>
+  </form>
 
   <script>
-    const allowedEmails = ["shahzebahmad2024@gmail.com", "trustindeal.amanwiz@gmail.com"];
     const scriptURL = "https://script.google.com/macros/s/AKfycbzb4tivDfLHvTTgTKDhPZRQyNnn5ZouPURgQmPkzUO-8awT_e3FMnG_ishuCPZrYj7Tcw/exec";
-    const clientID = "599836800018-6df1f03d2l70q5aoncd0s3b99j72je38.apps.googleusercontent.com";
 
-    window.onload = () => {
-      if (window.google && google.accounts && google.accounts.id) {
-        google.accounts.id.initialize({
-          client_id: clientID,
-          callback: handleCredentialResponse
-        });
-        google.accounts.id.renderButton(
-          document.getElementById("signinBtn"),
-          { theme: "outline", size: "large", type: "standard", shape: "pill" }
-        );
-      }
-      document.getElementById("dataForm").addEventListener("submit", onSubmit);
-    };
-
-    function parseJwt(token) {
-      try {
-        const base64Url = token.split('.')[1];
-        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-        const jsonPayload = decodeURIComponent(atob(base64).split('').map(c =>
-          '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
-        ).join(''));
-        return JSON.parse(jsonPayload);
-      } catch {
-        return {};
-      }
-    }
-
-    function handleCredentialResponse(response) {
-      const payload = parseJwt(response.credential);
-      const email = payload.email || "";
-      console.log("Google Sign-in Email:", email);
-
-      const formCard = document.getElementById("formCard");
-      const signinCard = document.getElementById("signinCard");
-      const deniedMsg = document.getElementById("deniedMsg");
-      const whoami = document.getElementById("whoami");
-
-      if (allowedEmails.includes(email)) {
-        document.querySelector('[name="email"]').value = email;
-        whoami.innerHTML = `Primary line marking`;
-        deniedMsg.classList.add("hidden");
-        signinCard.classList.add("hidden");
-        formCard.classList.remove("hidden");
-        autoDetectLocation();
-      } else {
-        deniedMsg.classList.remove("hidden");
-      }
-    }
-
-    function autoDetectLocation() {
-      if (!navigator.geolocation) {
-        showManualLocation();
-        return;
-      }
-      navigator.geolocation.getCurrentPosition(
-        pos => {
-          const lat = pos.coords.latitude;
-          const lon = pos.coords.longitude;
-          const mapsLink = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}`;
-          document.querySelector('[name="locationLink"]').value = mapsLink;
-        },
-        () => {
-          showManualLocation();
-        },
-        { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
-      );
-    }
-
-    function showManualLocation() {
-      document.getElementById("locationRow").classList.remove("hidden");
-    }
-
-    async function compressImageToDataURL(file, maxKB = 200) {
+    async function compressImageToDataURL(file, maxSizeKB) {
+      if (!file) return "";
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
-        reader.onload = () => {
+        reader.onload = event => {
           const img = new Image();
           img.onload = () => {
             const canvas = document.createElement("canvas");
             const ctx = canvas.getContext("2d");
-            const scale = Math.min(1, Math.sqrt((maxKB * 1024) / file.size));
-            canvas.width = Math.round(img.width * scale);
-            canvas.height = Math.round(img.height * scale);
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-            let quality = 0.75;
+
+            let width = img.width;
+            let height = img.height;
+            const maxDim = 1024;
+            if (width > height) {
+              if (width > maxDim) {
+                height *= maxDim / width;
+                width = maxDim;
+              }
+            } else {
+              if (height > maxDim) {
+                width *= maxDim / height;
+                height = maxDim;
+              }
+            }
+            canvas.width = width;
+            canvas.height = height;
+            ctx.drawImage(img, 0, 0, width, height);
+
+            let quality = 0.9;
             let dataUrl = canvas.toDataURL("image/jpeg", quality);
-            while (dataUrl.length / 1024 > maxKB && quality > 0.2) {
+            while (dataUrl.length / 1024 > maxSizeKB && quality > 0.1) {
               quality -= 0.05;
               dataUrl = canvas.toDataURL("image/jpeg", quality);
             }
             resolve(dataUrl);
           };
-          img.src = reader.result;
+          img.onerror = () => reject(new Error("Image load error"));
+          img.src = event.target.result;
         };
-        reader.onerror = () => reject(new Error("Failed to read file"));
+        reader.onerror = () => reject(new Error("File read error"));
         reader.readAsDataURL(file);
       });
     }
 
-    async function onSubmit(e) {
+    document.getElementById("markerForm").addEventListener("submit", async function(e) {
       e.preventDefault();
       const form = e.target;
       const submitStatus = document.getElementById("submitStatus");
@@ -228,7 +145,7 @@
 
       const payload = {
         email: form.email.value,
-        locationLink: form.locationLink ? form.locationLink.value : "",
+        locationLink: form.locationLink.value,
         photo1: photos[0],
         photo2: photos[1],
         jcName: form.jcName.value,
@@ -240,20 +157,19 @@
         remark: form.remark.value
       };
 
-      console.log("Sending payload to server:", payload);
-
       submitStatus.textContent = "Submitting...";
-      fetch(scriptURL, {
-        method: "POST",
-        body: JSON.stringify(payload),
-        headers: { "Content-Type": "application/json" }
-      })
-      .then(r => {
-        console.log("Raw response object:", r);
-        return r.json();
-      })
-      .then(resp => {
-        console.log("Server JSON response:", resp);
+      try {
+        const response = await fetch(scriptURL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const resp = await response.json();
         if (resp.status === "success") {
           submitStatus.textContent = "Submitted ✓";
           form.reset();
@@ -262,13 +178,11 @@
           submitStatus.textContent = "";
           alert("Error from server: " + (resp.message || "Unknown error"));
         }
-      })
-      .catch(err => {
+      } catch (err) {
         submitStatus.textContent = "";
-        console.error("Network/Fetch Error:", err);
         alert("Network error: " + err.message);
-      });
-    }
+      }
+    });
   </script>
 </body>
 </html>
