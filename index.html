@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Secure Data Form</title>
+  <title>Tag splitter</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <style>
@@ -21,7 +21,7 @@
   </style>
 </head>
 <body>
-  <h2>Secure Data Form</h2>
+  <h2>Tag splitter</h2>
 
   <!-- Sign-in card -->
   <div id="signinCard" class="card">
@@ -29,7 +29,7 @@
       <div id="signinBtn"></div>
     </div>
     <div id="accessMsg" class="row muted">
-      Sign in with Google. Only allowed emails can access the form.
+      Please contact Admin if your id is not registered!
     </div>
     <div id="deniedMsg" class="row error hidden">Access denied — your email is not allowed.</div>
   </div>
@@ -38,46 +38,85 @@
   <div id="formCard" class="card hidden">
     <div class="row muted" id="whoami"></div>
     <form id="dataForm">
+      <!-- Hidden email -->
+      <input type="email" name="email" readonly required class="hidden" />
+
+      <!-- Location Link -->
+      <div id="locationRow" class="row hidden">
+        <label>Location Link</label>
+        <input type="text" name="locationLink" placeholder="Paste Google Maps link" />
+      </div>
+
+      <!-- JC Photo -->
       <div class="row">
-        <label>Email</label>
-        <input type="email" name="email" readonly required />
+        <label>JC Photo</label>
+        <input type="file" name="photo1" accept="image/*" capture="environment" required />
       </div>
 
-      <div class="row actions">
-        <button type="button" id="locBtn">Get Location</button>
-        <span id="locStatus" class="muted">Location not captured</span>
-      </div>
-
-      <div class="row" style="display:flex; gap:8px;">
-        <input type="text" name="latitude" placeholder="Latitude" readonly required />
-        <input type="text" name="longitude" placeholder="Longitude" readonly required />
-      </div>
-
-      <!-- Manual location link fallback -->
-      <div class="row hidden" id="manualLocRow">
-        <label>Location Link (Google Maps)</label>
-        <input type="text" name="locationLink" placeholder="Paste Google Maps link here" />
-      </div>
-
+      <!-- Area Photo -->
       <div class="row">
-        <label>Photo 1 (required)</label>
-        <input type="file" name="photo1" accept="image/*" required />
+        <label>Area Photo</label>
+        <input type="file" name="photo2" accept="image/*" capture="environment" required />
       </div>
 
+      <!-- JC Name -->
       <div class="row">
-        <label>Photo 2 (optional)</label>
-        <input type="file" name="photo2" accept="image/*" />
+        <label>JC Name</label>
+        <input type="text" name="jcName" required />
       </div>
 
+      <!-- Select splitter -->
       <div class="row">
-        <label>Choice</label>
-        <select name="choice" required>
+        <label>Select splitter</label>
+        <select name="splitter" required>
           <option value="">-- Select --</option>
-          <option value="Yes">Yes</option>
-          <option value="No">No</option>
+          <option>2 way</option>
+          <option>4 way</option>
+          <option>8 way</option>
+          <option>16 way</option>
         </select>
       </div>
 
+      <!-- Select wire -->
+      <div class="row">
+        <label>Select wire</label>
+        <select name="wire" required>
+          <option value="">-- Select --</option>
+          <option>1 Core</option>
+          <option>2 Core</option>
+          <option>4 Core</option>
+          <option>6 Core</option>
+          <option>12 Core</option>
+          <option>24 Core</option>
+          <option>48 Core</option>
+          <option>96 Core</option>
+        </select>
+      </div>
+
+      <!-- Wire color -->
+      <div class="row">
+        <label>Wire color</label>
+        <select name="wireColor" required>
+          <option value="">-- Select --</option>
+          <option>Black</option>
+          <option>Orange</option>
+          <option>Other</option>
+        </select>
+      </div>
+
+      <!-- Line name (optional) -->
+      <div class="row">
+        <label>Line name</label>
+        <input type="text" name="lineName" />
+      </div>
+
+      <!-- Drum no (optional) -->
+      <div class="row">
+        <label>Drum no</label>
+        <input type="text" name="drumNo" />
+      </div>
+
+      <!-- Remarks -->
       <div class="row">
         <label>Remark</label>
         <textarea name="remark" placeholder="Write remarks..."></textarea>
@@ -91,12 +130,10 @@
   </div>
 
   <script>
-    // ====== CONFIG ======
     const allowedEmails = ["shahzebahmad2024@gmail.com", "trustindeal.amanwiz@gmail.com"];
-    const scriptURL = "https://script.google.com/macros/s/AKfycbyb0CI0mL5nkHmLjYm_AYwgZyhcmefGGJ85NAvsLrbQGLa-oaoy0no_q0A9Ky-PIqh6kw/exec";
-    const clientID = "599836800018-6df1f03d2l70q5aoncd0s3b99j72je38.apps.googleusercontent.com";
+    const scriptURL = "YOUR_GOOGLE_APPS_SCRIPT_URL";
+    const clientID = "YOUR_CLIENT_ID";
 
-    // ====== GOOGLE SIGN-IN ======
     window.onload = () => {
       if (window.google && google.accounts && google.accounts.id) {
         google.accounts.id.initialize({
@@ -108,7 +145,7 @@
           { theme: "outline", size: "large", type: "standard", shape: "pill" }
         );
       }
-      document.getElementById("locBtn").addEventListener("click", getLocation);
+      detectLocation();
       document.getElementById("dataForm").addEventListener("submit", onSubmit);
     };
 
@@ -128,97 +165,39 @@
     function handleCredentialResponse(response) {
       const payload = parseJwt(response.credential);
       const email = payload.email || "";
-      const formCard = document.getElementById("formCard");
-      const signinCard = document.getElementById("signinCard");
-      const deniedMsg = document.getElementById("deniedMsg");
-      const whoami = document.getElementById("whoami");
-
       if (allowedEmails.includes(email)) {
         document.querySelector('[name="email"]').value = email;
-        whoami.innerHTML = `Signed in as <b>${email}</b> — access granted.`;
-        deniedMsg.classList.add("hidden");
-        signinCard.classList.add("hidden");
-        formCard.classList.remove("hidden");
+        document.getElementById("whoami").innerHTML = `<b>Primary line marking</b>`;
+        document.getElementById("signinCard").classList.add("hidden");
+        document.getElementById("formCard").classList.remove("hidden");
       } else {
-        deniedMsg.classList.remove("hidden");
+        document.getElementById("deniedMsg").classList.remove("hidden");
       }
     }
 
-    // ====== LOCATION with manual fallback ======
-    function getLocation() {
-      const locStatus = document.getElementById("locStatus");
-      const latInput = document.querySelector("[name=latitude]");
-      const lonInput = document.querySelector("[name=longitude]");
-      const manualLocRow = document.getElementById("manualLocRow");
-      const locationLinkInput = document.querySelector("[name=locationLink]");
-
-      // reset state
-      manualLocRow.classList.add("hidden");
-      locationLinkInput.required = false;
-      latInput.value = "";
-      lonInput.value = "";
-
+    function detectLocation() {
       if (!navigator.geolocation) {
-        locStatus.textContent = "Geolocation not supported — please paste a location link.";
-        locStatus.className = "error";
-        manualLocRow.classList.remove("hidden");
-        locationLinkInput.required = true;
+        showLocationInput();
         return;
       }
-
-      locStatus.textContent = "Fetching location...";
       navigator.geolocation.getCurrentPosition(
         pos => {
-          latInput.value = pos.coords.latitude;
-          lonInput.value = pos.coords.longitude;
-          locStatus.textContent = "Location captured ✓";
-          locStatus.className = "muted ok";
-          manualLocRow.classList.add("hidden");
-          locationLinkInput.required = false;
+          const lat = pos.coords.latitude;
+          const lon = pos.coords.longitude;
+          const link = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}`;
+          document.querySelector('[name="locationLink"]').value = link;
         },
-        err => {
-          locStatus.textContent = "GPS failed — please paste a location link.";
-          locStatus.className = "error";
-          manualLocRow.classList.remove("hidden");
-          locationLinkInput.required = true;
-          alert("Please paste your location link manually.");
-        },
-        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+        () => { showLocationInput(); },
+        { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
       );
     }
 
-    // ====== IMAGE COMPRESSION (target ~200KB) ======
-    function compressImageToDataURL(file, maxKB = 200) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onerror = () => reject(new Error("Failed to read file"));
-        reader.onload = () => {
-          const img = new Image();
-          img.onerror = () => reject(new Error("Invalid image"));
-          img.onload = () => {
-            const canvas = document.createElement("canvas");
-            const ctx = canvas.getContext("2d");
-
-            const scale = Math.min(1, Math.sqrt((maxKB * 1024) / (file.size || (img.width * img.height))));
-            canvas.width = Math.max(1, Math.round(img.width * scale));
-            canvas.height = Math.max(1, Math.round(img.height * scale));
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-            let quality = 0.75;
-            let dataUrl = canvas.toDataURL("image/jpeg", quality);
-            while (dataUrl.length / 1024 > maxKB && quality > 0.2) {
-              quality -= 0.05;
-              dataUrl = canvas.toDataURL("image/jpeg", quality);
-            }
-            resolve(dataUrl);
-          };
-          img.src = reader.result;
-        };
-        reader.readAsDataURL(file);
-      });
+    function showLocationInput() {
+      const locRow = document.getElementById("locationRow");
+      locRow.classList.remove("hidden");
+      document.querySelector('[name="locationLink"]').required = true;
     }
 
-    // ====== SUBMIT ======
     async function onSubmit(e) {
       e.preventDefault();
       const form = e.target;
@@ -229,27 +208,25 @@
       const p1 = form.photo1.files[0];
       const p2 = form.photo2.files[0];
 
-      if (!p1) {
-        alert("Photo 1 is required.");
+      if (!p1 || !p2) {
+        alert("Both photos are required.");
         return;
       }
 
-      try {
-        photos.push(await compressImageToDataURL(p1, 200));
-        if (p2) photos.push(await compressImageToDataURL(p2, 200));
-      } catch (err) {
-        alert("Image processing failed: " + err.message);
-        return;
-      }
+      photos.push(await compressImageToDataURL(p1, 200));
+      photos.push(await compressImageToDataURL(p2, 200));
 
       const payload = {
         email: form.email.value,
-        latitude: form.latitude.value,
-        longitude: form.longitude.value,
-        locationLink: form.locationLink.value || "",
-        photos,
-        choice: form.choice.value,
-        remark: form.remark.value
+        locationLink: form.locationLink.value || document.querySelector('[name="locationLink"]').value,
+        jcName: form.jcName.value,
+        splitter: form.splitter.value,
+        wire: form.wire.value,
+        wireColor: form.wireColor.value,
+        lineName: form.lineName.value,
+        drumNo: form.drumNo.value,
+        remark: form.remark.value,
+        photos
       };
 
       submitStatus.textContent = "Submitting...";
@@ -263,19 +240,41 @@
         if (resp.status === "success") {
           submitStatus.textContent = "Submitted ✓";
           form.reset();
-          document.querySelector('[name="email"]').value = payload.email;
-          document.getElementById("locStatus").textContent = "Location not captured";
-          document.getElementById("locStatus").className = "muted";
-          document.getElementById("manualLocRow").classList.add("hidden");
           alert("Data submitted successfully!");
         } else {
           submitStatus.textContent = "";
-          alert("Error from server: " + (resp.message || "Unknown error"));
+          alert("Error: " + (resp.message || "Unknown error"));
         }
       })
       .catch(err => {
         submitStatus.textContent = "";
         alert("Network error: " + err);
+      });
+    }
+
+    function compressImageToDataURL(file, maxKB = 200) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement("canvas");
+            const ctx = canvas.getContext("2d");
+            const scale = Math.min(1, Math.sqrt((maxKB * 1024) / (file.size || (img.width * img.height))));
+            canvas.width = Math.round(img.width * scale);
+            canvas.height = Math.round(img.height * scale);
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            let quality = 0.75;
+            let dataUrl = canvas.toDataURL("image/jpeg", quality);
+            while (dataUrl.length / 1024 > maxKB && quality > 0.2) {
+              quality -= 0.05;
+              dataUrl = canvas.toDataURL("image/jpeg", quality);
+            }
+            resolve(dataUrl);
+          };
+          img.src = reader.result;
+        };
+        reader.readAsDataURL(file);
       });
     }
   </script>
