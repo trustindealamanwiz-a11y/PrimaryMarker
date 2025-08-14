@@ -221,55 +221,52 @@
     }
 
     async function onSubmit(e) {
-      e.preventDefault();
-      const form = e.target;
-      const submitStatus = document.getElementById("submitStatus");
-      submitStatus.textContent = "Compressing images...";
+  e.preventDefault();
+  const form = e.target;
+  const submitStatus = document.getElementById("submitStatus");
+  submitStatus.textContent = "Compressing images...";
 
-      const photos = [];
-      try {
-        photos.push(await compressImageToDataURL(form.photo1.files[0], 200));
-        photos.push(await compressImageToDataURL(form.photo2.files[0], 200));
-      } catch (err) {
-        alert("Image processing failed: " + err.message);
-        return;
-      }
+  const photos = [];
+  try {
+    photos.push(await compressImageToDataURL(form.photo1.files[0], 200));
+    photos.push(await compressImageToDataURL(form.photo2.files[0], 200));
+  } catch (err) {
+    alert("Image processing failed: " + err.message);
+    return;
+  }
 
-      const payload = {
-        email: form.email.value,
-        locationLink: form.locationLink ? form.locationLink.value : "",
-        photos,
-        jcName: form.jcName.value,
-        splitter: form.splitter.value,
-        wire: form.wire.value,
-        wireColor: form.wireColor.value,
-        lineName: form.lineName.value,
-        drumNo: form.drumNo.value,
-        remark: form.remark.value
-      };
+  const formData = new FormData();
+  formData.append("email", form.email.value);
+  formData.append("locationLink", form.locationLink ? form.locationLink.value : "");
+  formData.append("photo1", photos[0]);
+  formData.append("photo2", photos[1]);
+  formData.append("jcName", form.jcName.value);
+  formData.append("splitter", form.splitter.value);
+  formData.append("wire", form.wire.value);
+  formData.append("wireColor", form.wireColor.value);
+  formData.append("lineName", form.lineName.value);
+  formData.append("drumNo", form.drumNo.value);
+  formData.append("remark", form.remark.value);
 
-      submitStatus.textContent = "Submitting...";
-      fetch(scriptURL, {
-        method: "POST",
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify(payload)
-      })
-      .then(r => r.json())
-      .then(resp => {
-        if (resp.status === "success") {
-          submitStatus.textContent = "Submitted ✓";
-          form.reset();
-          alert("Data submitted successfully!");
-        } else {
-          submitStatus.textContent = "";
-          alert("Error from server: " + (resp.message || "Unknown error"));
-        }
-      })
-      .catch(err => {
+  submitStatus.textContent = "Submitting...";
+  fetch(scriptURL, { method: "POST", body: formData })
+    .then(r => r.json())
+    .then(resp => {
+      if (resp.status === "success") {
+        submitStatus.textContent = "Submitted ✓";
+        form.reset();
+        alert("Data submitted successfully!");
+      } else {
         submitStatus.textContent = "";
-        alert("Network error: " + err);
-      });
-    }
+        alert("Error from server: " + (resp.message || "Unknown error"));
+      }
+    })
+    .catch(err => {
+      submitStatus.textContent = "";
+      alert("Network error: " + err);
+    });
+}
+
   </script>
 </body>
 </html>
