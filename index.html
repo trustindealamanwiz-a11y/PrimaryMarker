@@ -116,6 +116,7 @@
 
       <div class="row actions">
         <button type="submit" id="submitBtn" disabled>Tagging done</button>
+        <span id="countdown" class="muted"></span> <!-- 🔹 yeh naya span timer show ka -->
         <span id="submitStatus" class="muted"></span>
       </div>
     </form>
@@ -284,16 +285,27 @@
 
 function startTagging() {
     const submitBtn = document.getElementById('submitBtn');
-    submitBtn.disabled = true; // Start me disable hi rahega
+    const countdownEl = document.getElementById('countdown');
 
-    // Save current timestamp in hidden field
+    let remaining = 5; // seconds
+    submitBtn.disabled = true;
+    countdownEl.textContent = `Wait ${remaining}s...`;
+
+    // Save current timestamp
     document.querySelector('[name="startTime"]').value = new Date().toISOString();
-  
-    // 60 seconds ke baad enable karo
-    setTimeout(() => {
-        submitBtn.disabled = false;
-    }, 60000);
+
+    const timer = setInterval(() => {
+        remaining--;
+        if (remaining > 0) {
+            countdownEl.textContent = `Wait ${remaining}s...`;
+        } else {
+            clearInterval(timer);
+            countdownEl.textContent = '';
+            submitBtn.disabled = false;
+        }
+    }, 1000);
 }
+
 
     
   </script>
