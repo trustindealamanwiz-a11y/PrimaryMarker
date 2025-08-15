@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Tag Splitter</title>
+  <title>Tagging splitters</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <link rel="stylesheet" href="style.css">
@@ -183,7 +183,7 @@ input[type="file"]:hover::before {
       const email = payload.email || "";
       if (allowedEmails.includes(email)) {
         document.querySelector('[name="email"]').value = email;
-        document.getElementById("whoami").innerHTML = `Fiber line marking`;
+        document.getElementById("whoami").innerHTML = ``;
         document.getElementById("deniedMsg").classList.add("hidden");
         document.getElementById("signinCard").classList.add("hidden");
         document.getElementById("formCard").classList.remove("hidden");
