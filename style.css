@@ -134,28 +134,84 @@ button:disabled {
 .actions button { flex: 1; }
 
 /* -------------------
-   Form Steps
+   Form Steps (Modern Design)
 -------------------- */
-.form-step {
-    font-weight: bold;
-    font-size: 1.2em;
+.steps {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    position: relative;
+}
+.steps::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: #e5e7eb;
+    transform: translateY(-50%);
+    z-index: 0;
+}
+.step {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    flex: 1;
+}
+.step-circle {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--secondary);
+    border: 2px solid var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--primary);
+    margin: 0 auto 8px;
+    transition: all 0.3s ease;
+}
+.step.active .step-circle {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary-dark);
+    box-shadow: 0 0 10px rgba(37, 99, 235, 0.3);
+}
+.step.completed .step-circle {
+    background: var(--success);
+    color: white;
+    border-color: var(--success);
+}
+.step-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-light);
+}
+.step.active .step-label {
     color: var(--primary-dark);
-    margin-bottom: 10px;
-    padding-bottom: 6px;
-    border-bottom: 2px solid var(--primary);
+    font-weight: 600;
 }
 
-/* Step Card */
+/* Step Card (Improved Style) */
 .step-card {
     background: white;
     border-radius: var(--border-radius);
-    padding: 16px;
-    margin-bottom: 16px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    border: 1px solid #e5e7eb;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.step-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
 }
 
 /* -------------------
-   Spinner overlay (HTML version - final)
+   Spinner overlay
 -------------------- */
 .spinner-overlay {
     position: fixed;
@@ -235,7 +291,6 @@ button:disabled {
     button { font-size: 18px; padding: 14px; }
     .step-card { padding: 12px; }
 }
-
 @media (min-width: 768px) {
     .two-column {
         display: grid;
