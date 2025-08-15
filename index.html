@@ -74,7 +74,7 @@ input[type="file"]:hover::before {
 
       <div class="form-step">Step 1 - Click on start Tagging</div>
       <div id="locationRow" class="row hidden">
-        <input type="text" name="locationLink" placeholder="Enter Google Maps Link" />
+        <input type="text" name="locationLink" placeholder="Enter Google Maps Link" required />
       </div>
       <button type="button" id="startTaggingBtn" class="btn primary" onclick="startTagging()">Start Tagging</button>
 
@@ -194,7 +194,8 @@ input[type="file"]:hover::before {
 
     function autoDetectLocation() {
       if (!navigator.geolocation) {
-        document.getElementById("locationRow").classList.remove("hidden");
+     document.getElementById("locationRow").classList.remove("hidden");
+      document.querySelector("[name=locationLink]").setAttribute("required", "true");
         return;
       }
       navigator.geolocation.getCurrentPosition(
