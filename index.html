@@ -289,7 +289,8 @@ function startTagging() {
 
     let remaining = 5; // seconds
     submitBtn.disabled = true;
-    startBtn.disabled = true;
+      const startBtn = document.getElementById('startTaggingBtn');
+      startBtn.disabled = true;
   
     countdownEl.textContent = `Wait ${remaining}s...`;
 
