@@ -302,16 +302,44 @@
     }
 
 
-    document.querySelector("form").addEventListener("submit", function(e) {
+document.querySelector("form").addEventListener("submit", function(e) {
     // Show spinner
     const overlay = document.createElement("div");
     overlay.className = "spinner-overlay";
-    overlay.innerHTML = '<div class="spinner"></div><p style="margin-top:10px;">Submitting...</p>';
+    overlay.innerHTML = '<div class="spinner"></div>';
     document.body.appendChild(overlay);
 
-    // Disable all inputs
+    // Disable inputs
     document.querySelectorAll("input, select, textarea, button").forEach(el => el.disabled = true);
+
+    // Simulate submission (replace with actual backend callback)
+    setTimeout(() => {
+        // Remove spinner
+        document.querySelector(".spinner-overlay")?.remove();
+
+        // Enable inputs again (if needed)
+        document.querySelectorAll("input, select, textarea, button").forEach(el => el.disabled = false);
+
+        // Show success message
+        showMessage("✅ Data submitted successfully!", "success");
+
+    }, 2000); // Simulated delay
 });
+
+// Message handler
+function showMessage(text, type) {
+    const msg = document.createElement("div");
+    msg.className = `message-box ${type}`;
+    msg.textContent = text;
+    document.body.appendChild(msg);
+
+    // Auto hide after 3s
+    setTimeout(() => {
+        msg.classList.add("fade-out");
+        setTimeout(() => msg.remove(), 500);
+    }, 3000);
+}
+
 
 
     
