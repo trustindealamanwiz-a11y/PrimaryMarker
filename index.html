@@ -61,6 +61,7 @@
     }
     .toast.success { background: #28a745; }
     .toast.error { background: #dc3545; }
+    .toast.info { background: #007bff; }
     .toast.fade-out { opacity: 0; }
   </style>
 </head>
@@ -85,19 +86,15 @@
     <div class="row muted" id="whoami"></div>
 
     <form id="dataForm">
-      <!-- Hidden email field -->
       <input type="email" name="email" class="hidden" readonly required />
-      <!-- Start Tagging Time -->
       <input type="hidden" name="startTime" />
 
-      <!-- Step 1 -->
       <div class="form-step">Step 1 - Click on start Tagging</div>
       <div id="locationRow" class="row hidden">
         <input type="text" name="locationLink" placeholder="Enter Google Maps Link" />
       </div>
       <button type="button" id="startTaggingBtn" onclick="startTagging()">Start Tagging</button>
 
-      <!-- Step 2 -->
       <div class="form-step">Step 2 - Break splitter input (Select only one splitter)</div>
       <div class="row">
         <select name="splitter" required>
@@ -109,19 +106,16 @@
         </select>
       </div>
 
-      <!-- Step 3 -->
       <div class="form-step">Step 3 - Attach JC pick (Closeup with wire marking)</div>
       <div class="row">
         <input type="file" name="photo1" accept="image/*" capture="environment" required />
       </div>
 
-      <!-- Step 4 -->
       <div class="form-step">Step 4 - Attach location pick (Pole and area photo)</div>
       <div class="row">
         <input type="file" name="photo2" accept="image/*" capture="environment" required />
       </div>
 
-      <!-- Step 5 -->
       <div class="form-step">Step 5 - Fill line details below</div>
       <div class="row">
         <input type="text" name="jcname" required placeholder="Enter JC Name" />
@@ -157,7 +151,6 @@
         <textarea name="remark" placeholder="Write remarks..."></textarea>
       </div>
 
-      <!-- Step 6 -->
       <div class="form-step">Step 6 - Splice Splitter input</div>
       <div class="row actions">
         <button type="submit" id="submitBtn" disabled>Tagging done</button>
@@ -264,7 +257,6 @@
       e.preventDefault();
       const form = e.target;
 
-      // Spinner
       const overlay = document.createElement("div");
       overlay.className = "spinner-overlay";
       overlay.innerHTML = '<div class="spinner"></div><div class="spinner-text">Submitting...</div>';
@@ -333,28 +325,31 @@
       }, 3000);
     }
 
-function startTagging() {
-    const submitBtn = document.getElementById('submitBtn');
-    const startTimeField = document.querySelector('[name="startTime"]');
+    function startTagging() {
+      const submitBtn = document.getElementById('submitBtn');
+      const startTimeField = document.querySelector('[name="startTime"]');
+      const countdownEl = document.getElementById('countdown');
+      const startBtn = document.getElementById('startTaggingBtn');
 
-    // Start time record
-    startTimeField.value = new Date().toISOString();
+      startTimeField.value = new Date().toISOString();
+      submitBtn.disabled = true;
+      startBtn.disabled = true;
 
-    // Disable submit button
-    submitBtn.disabled = true;
+      let remaining = 60;
+      countdownEl.textContent = `Wait ${remaining} seconds...`;
+      showToast("🕒 Please wait 60 seconds before submitting.", "info");
 
-    // Toast message
-    showToast("🕒 Please wait 60 seconds before submitting.", "info");
-
-    // Enable after 60 seconds
-    setTimeout(() => {
-        submitBtn.disabled = false;
-        showToast("✅ You can now submit the form.", "success");
-    }, 60000);
-}
-
-
-    
+      const timer = setInterval(() => {
+        remaining--;
+        countdownEl.textContent = `Wait ${remaining} seconds...`;
+        if (remaining <= 0) {
+          clearInterval(timer);
+          submitBtn.disabled = false;
+          countdownEl.textContent = "";
+          showToast("✅ You can now submit the form.", "success");
+        }
+      }, 1000);
+    }
   </script>
 </body>
 </html>
