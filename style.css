@@ -1,118 +1,156 @@
+/* -------------------
+   Base Layout & Colors
+-------------------- */
+:root {
+    --primary: #2563eb;
+    --primary-dark: #1e40af;
+    --secondary: #f3f4f6;
+    --text-dark: #1f2937;
+    --text-light: #6b7280;
+    --success: #16a34a;
+    --error: #dc2626;
+    --border-radius: 10px;
+}
 
-a/* Base layout */
 body {
     font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
     max-width: 720px;
-    margin: 24px auto;
-    padding: 0 16px;
-    background-color: #f9f9f9;
-    color: #333;
-}
-
-/* Headings */
-h2 {
-    margin-top: 0;
-    font-size: 1.4rem;
-    color: #222;
-}
-
-/* Card container */
-.card {
-    border: 1px solid #ddd;
-    border-radius: 12px;
+    margin: 0 auto;
     padding: 16px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-    background-color: #fff;
+    background-color: var(--secondary);
+    color: var(--text-dark);
+    line-height: 1.5;
 }
 
-/* Row spacing */
+/* -------------------
+   Typography
+-------------------- */
+h1, h2, h3 {
+    margin-top: 0;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+h2 {
+    font-size: 1.5rem;
+    margin-bottom: 12px;
+}
+
+/* -------------------
+   Card Container
+-------------------- */
+.card {
+    background: white;
+    border-radius: var(--border-radius);
+    padding: 16px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.04);
+    border: 1px solid #e5e7eb;
+}
+
+/* -------------------
+   Form Elements
+-------------------- */
 .row {
-    margin: 10px 0;
+    margin: 12px 0;
 }
 
-/* Form elements */
+label {
+    font-size: 14px;
+    font-weight: 500;
+    display: block;
+    margin-bottom: 6px;
+    color: var(--text-dark);
+}
+
 input,
 select,
 textarea,
 button {
     font-size: 16px;
-    padding: 10px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-}
-
-/* Make inputs full-width */
-input[type="text"],
-input[type="email"],
-select,
-textarea {
+    padding: 10px 12px;
+    border-radius: var(--border-radius);
+    border: 1px solid #d1d5db;
     width: 100%;
     box-sizing: border-box;
+    transition: all 0.2s ease-in-out;
 }
 
-/* Textarea size */
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: var(--primary);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
 textarea {
     min-height: 90px;
+    resize: vertical;
 }
 
-/* Hide elements */
+/* -------------------
+   Utility Classes
+-------------------- */
 .hidden {
-    display: none;
+    display: none !important;
 }
 
-/* Muted text */
 .muted {
-    color: #666;
+    color: var(--text-light);
     font-size: 14px;
 }
 
-/* Status colors */
 .error {
-    color: #c00;
-    margin-top: 8px;
+    color: var(--error);
+    margin-top: 6px;
 }
 
 .ok {
-    color: #0a0;
+    color: var(--success);
 }
 
-/* Button row */
+/* -------------------
+   Buttons
+-------------------- */
+button {
+    background-color: var(--primary);
+    color: white;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: var(--primary-dark);
+}
+
+button:disabled {
+    background-color: #9ca3af;
+    cursor: not-allowed;
+}
+
+/* Actions Row */
 .actions {
     display: flex;
     gap: 8px;
     align-items: center;
+    margin-top: 10px;
 }
 
-/* Buttons */
-button {
-    background-color: #007BFF;
-    color: white;
-    border: none;
-    cursor: pointer;
-    transition: background-color 0.2s;
+.actions button {
+    flex: 1;
 }
 
-button:hover {
-    background-color: #0069d9;
-}
-
-button:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
-}
-
-/* Mobile responsiveness */
+/* -------------------
+   Mobile Responsiveness
+-------------------- */
 @media (max-width: 480px) {
     body {
-        padding: 0 12px;
+        padding: 12px;
     }
 
     .card {
         padding: 12px;
-    }
-
-    button {
-        width: 100%;
     }
 
     .actions {
