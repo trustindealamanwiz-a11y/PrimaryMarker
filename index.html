@@ -33,7 +33,6 @@
   <div id="formCard" class="card hidden">
     <div class="row muted" id="whoami"></div>
 
-    
     <form id="dataForm">
       
       <!-- Hidden email field -->
@@ -41,30 +40,15 @@
       <!-- Start Tagging Time -->
       <input type="hidden" name="startTime" />
 
-      <!-- Auto Location / Manual Fallback -->
+      <!-- Step 1 -->
+      <div class="form-step">Step 1 - Click on start Tagging</div>
       <div id="locationRow" class="row hidden">
-
-       
         <input type="text" name="locationLink" placeholder="Enter Google Maps Link" />
       </div>
-
-      <!-- JC Photo -->
       <button type="button" id="startTaggingBtn" onclick="startTagging()">Start Tagging</button>
-      <div class="row">
-        <input type="file" name="photo1" accept="image/*" capture="environment" required placeholder="Upload JC Photo" />
-      </div>
 
-      <!-- Area Photo -->
-      <div class="row">
-        <input type="file" name="photo2" accept="image/*" capture="environment" required placeholder="Upload Area Photo" />
-      </div>
-
-      <!-- JC Name -->
-      <div class="row">
-        <input type="text" name="jcname" required placeholder="Enter JC Name" />
-      </div>
-
-      <!-- Select Splitter -->
+      <!-- Step 2 -->
+      <div class="form-step">Step 2 - Break splitter input (Select only one splitter)</div>
       <div class="row">
         <select name="splitter" required>
           <option value="">Select Splitter</option>
@@ -75,7 +59,23 @@
         </select>
       </div>
 
-      <!-- Select Wire -->
+      <!-- Step 3 -->
+      <div class="form-step">Step 3 - Attach JC pick (Closeup with wire marking)</div>
+      <div class="row">
+        <input type="file" name="photo1" accept="image/*" capture="environment" required placeholder="Upload JC Photo" />
+      </div>
+
+      <!-- Step 4 -->
+      <div class="form-step">Step 4 - Attach location pick (Pole and area photo)</div>
+      <div class="row">
+        <input type="file" name="photo2" accept="image/*" capture="environment" required placeholder="Upload Area Photo" />
+      </div>
+
+      <!-- Step 5 -->
+      <div class="form-step">Step 5 - Fill line details below</div>
+      <div class="row">
+        <input type="text" name="jcname" required placeholder="Enter JC Name" />
+      </div>
       <div class="row">
         <select name="wire" required>
           <option value="">Select Wire</option>
@@ -89,8 +89,6 @@
           <option>96 Core</option>
         </select>
       </div>
-
-      <!-- Wire Color -->
       <div class="row">
         <select name="wirecolor" required>
           <option value="">Select Wire Color</option>
@@ -99,22 +97,18 @@
           <option>Other</option>
         </select>
       </div>
-
-      <!-- Line Name -->
       <div class="row">
         <input type="text" name="linename" placeholder="Line Name (Optional)" />
       </div>
-
-      <!-- Drum No -->
       <div class="row">
         <input type="text" name="drumno" placeholder="Drum No (Optional)" />
       </div>
-
-      <!-- Remark -->
       <div class="row">
         <textarea name="remark" placeholder="Write remarks..."></textarea>
       </div>
 
+      <!-- Step 6 -->
+      <div class="form-step">Step 6 - Splice Splitter input</div>
       <div class="row actions">
         <button type="submit" id="submitBtn" disabled>Tagging done</button>
         <br>
@@ -205,7 +199,7 @@
           img.onload = () => {
             const canvas = document.createElement("canvas");
             const ctx = canvas.getContext("2d");
-            const scale = Math.min(1, Math.sqrt((maxKB * 1024) / (file.size || (img.width * img.height))));
+            const scale = Math.min(1, Math.sqrt((maxKB * 1024) / (file.size || (img.width * img.height)))); 
             canvas.width = Math.max(1, Math.round(img.width * scale));
             canvas.height = Math.max(1, Math.round(img.height * scale));
             ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
