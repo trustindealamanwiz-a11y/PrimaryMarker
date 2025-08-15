@@ -303,43 +303,47 @@
 
 
 document.querySelector("form").addEventListener("submit", function(e) {
+    e.preventDefault(); // stop normal submit until we finish
+
     // Show spinner
     const overlay = document.createElement("div");
     overlay.className = "spinner-overlay";
     overlay.innerHTML = '<div class="spinner"></div>';
     document.body.appendChild(overlay);
 
-    // Disable inputs
+    // Disable form
     document.querySelectorAll("input, select, textarea, button").forEach(el => el.disabled = true);
 
-    // Simulate submission (replace with actual backend callback)
+    // === Simulate backend call ===
+    // Replace this part with your actual Google Apps Script fetch()
     setTimeout(() => {
         // Remove spinner
         document.querySelector(".spinner-overlay")?.remove();
 
-        // Enable inputs again (if needed)
+        // Enable form
         document.querySelectorAll("input, select, textarea, button").forEach(el => el.disabled = false);
 
-        // Show success message
-        showMessage("✅ Data submitted successfully!", "success");
+        // Reset form
+        e.target.reset();
+
+        // Show toast notification
+        showToast("✅ Tagging submitted successfully!", "success");
 
     }, 2000); // Simulated delay
 });
 
-// Message handler
-function showMessage(text, type) {
-    const msg = document.createElement("div");
-    msg.className = `message-box ${type}`;
-    msg.textContent = text;
-    document.body.appendChild(msg);
+// Toast notification function
+function showToast(text, type) {
+    const toast = document.createElement("div");
+    toast.className = `toast ${type}`;
+    toast.textContent = text;
+    document.body.appendChild(toast);
 
-    // Auto hide after 3s
     setTimeout(() => {
-        msg.classList.add("fade-out");
-        setTimeout(() => msg.remove(), 500);
+        toast.classList.add("fade-out");
+        setTimeout(() => toast.remove(), 500);
     }, 3000);
 }
-
 
 
     
