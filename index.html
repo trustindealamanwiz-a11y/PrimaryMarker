@@ -49,6 +49,7 @@
       </div>
 
       <!-- JC Photo -->
+      <button type="button" id="startTaggingBtn" onclick="startTagging()">Start Tagging</button>
       <div class="row">
         <label>JC Photo</label>
         <input type="file" name="photo1" accept="image/*" capture="environment" required />
@@ -124,7 +125,7 @@
       </div>
 
       <div class="row actions">
-        <button type="submit">Submit</button>
+        <button type="submit" id="submitBtn" disabled>Tagging done</button>
         <span id="submitStatus" class="muted"></span>
       </div>
     </form>
@@ -288,6 +289,19 @@
         alert("Network error: " + err);
       });
     }
+
+
+function startTagging() {
+    const submitBtn = document.getElementById('submitBtn');
+    submitBtn.disabled = true; // Start me disable hi rahega
+
+    // 60 seconds ke baad enable karo
+    setTimeout(() => {
+        submitBtn.disabled = false;
+    }, 60000);
+}
+
+    
   </script>
 </body>
 </html>
