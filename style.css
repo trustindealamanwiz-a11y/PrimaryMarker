@@ -158,3 +158,6 @@ button:disabled {
         align-items: stretch;
     }
 }
+#countdown {
+  display: block;
+}
