@@ -213,25 +213,41 @@ button:disabled {
 /* -------------------
    Custom File Input
 -------------------- */
-.custom-file-label {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    padding: 10px 16px;
-    background: var(--primary);
-    color: white;
-    font-weight: 500;
+input[type="file"] {
+    position: relative;
+    width: 100%;
+    max-width: 300px;
+    padding: 35px 0;
+    border: 2px dashed #ccc;
     border-radius: var(--border-radius);
+    background: #f9f9f9;
     cursor: pointer;
-    transition: background var(--transition), transform var(--transition);
+    color: transparent; /* hides default text like "No file chosen" */
+    text-align: center;
 }
-.custom-file-label:hover {
+
+input[type="file"]::-webkit-file-upload-button {
+    visibility: hidden;
+}
+
+input[type="file"]::before {
+    content: "📷 Click Photo";
+    color: white;
+    background: var(--primary);
+    padding: 8px 14px;
+    border-radius: var(--border-radius);
+    font-size: 14px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+    white-space: nowrap;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+input[type="file"]:hover::before {
     background: var(--primary-dark);
-    transform: translateY(-1px);
-}
-.custom-file-label:active {
-    transform: translateY(0);
 }
 
 /* -------------------
