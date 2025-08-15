@@ -1,0 +1,166 @@
+/* -------------------
+   Base Layout & Colors
+-------------------- */
+:root {
+    --primary: #2563eb;
+    --primary-dark: #1e40af;
+    --secondary: #f3f4f6;
+    --text-dark: #1f2937;
+    --text-light: #6b7280;
+    --success: #16a34a;
+    --error: #dc2626;
+    --border-radius: 10px;
+}
+
+body {
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 16px;
+    background-color: var(--secondary);
+    color: var(--text-dark);
+    line-height: 1.5;
+}
+
+/* -------------------
+   Typography
+-------------------- */
+h1, h2, h3 {
+    margin-top: 0;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+h2 {
+    font-size: 1.5rem;
+    margin-bottom: 12px;
+}
+
+/* -------------------
+   Card Container
+-------------------- */
+.card {
+    background: white;
+    border-radius: var(--border-radius);
+    padding: 16px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.04);
+    border: 1px solid #e5e7eb;
+}
+
+/* -------------------
+   Form Elements
+-------------------- */
+.row {
+    margin: 12px 0;
+}
+
+label {
+    font-size: 14px;
+    font-weight: 500;
+    display: block;
+    margin-bottom: 6px;
+    color: var(--text-dark);
+}
+
+input,
+select,
+textarea,
+button {
+    font-size: 16px;
+    padding: 10px 12px;
+    border-radius: var(--border-radius);
+    border: 1px solid #d1d5db;
+    width: 100%;
+    box-sizing: border-box;
+    transition: all 0.2s ease-in-out;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: var(--primary);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+textarea {
+    min-height: 90px;
+    resize: vertical;
+}
+
+/* -------------------
+   Utility Classes
+-------------------- */
+.hidden {
+    display: none !important;
+}
+
+.muted {
+    color: var(--text-light);
+    font-size: 14px;
+}
+
+.error {
+    color: var(--error);
+    margin-top: 6px;
+}
+
+.ok {
+    color: var(--success);
+}
+
+/* -------------------
+   Buttons
+-------------------- */
+button {
+    background-color: var(--primary);
+    color: white;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: var(--primary-dark);
+}
+
+button:disabled {
+    background-color: #9ca3af;
+    cursor: not-allowed;
+}
+
+/* Actions Row */
+.actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.actions button {
+    flex: 1;
+}
+
+/* -------------------
+   Mobile Responsiveness
+-------------------- */
+@media (max-width: 480px) {
+    body {
+        padding: 12px;
+    }
+
+    .card {
+        padding: 12px;
+    }
+
+    .actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+.form-step {
+  font-weight: bold;
+  margin: 15px 0 5px;
+  font-size: 1.1em;
+  text-decoration: underline;
+}
