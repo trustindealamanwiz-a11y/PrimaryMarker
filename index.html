@@ -290,29 +290,32 @@
       });
     }
 
-    function startTagging() {
-      const submitBtn = document.getElementById('submitBtn');
-      const countdownEl = document.getElementById('countdown');
-      const startBtn = document.getElementById('startTaggingBtn');
+  function startTagging() {
+  const submitBtn = document.getElementById('submitBtn');
+  const startBtn = document.getElementById('startTaggingBtn');
 
-      let remaining = 10; 
-      submitBtn.disabled = true;
-      startBtn.disabled = true;
+  // Disable start button
+  startBtn.disabled = true;
+  startBtn.textContent = "Tagging Started...";
 
-      countdownEl.textContent = `Wait ${remaining}s...`;
-      document.querySelector('[name="startTime"]').value = new Date().toISOString();
+  // Disable submit button initially with countdown
+  let waitTime = 10; // seconds
+  submitBtn.disabled = true;
+  submitBtn.textContent = `Done Tagging (${waitTime})`;
 
-      const timer = setInterval(() => {
-        remaining--;
-        if (remaining > 0) {
-          countdownEl.textContent = `Wait ${remaining}s...`;
-        } else {
-          clearInterval(timer);
-          countdownEl.textContent = '';
-          submitBtn.disabled = false;
-        }
-      }, 1000);
+  // Countdown timer inside button
+  const countdownInterval = setInterval(() => {
+    waitTime--;
+    submitBtn.textContent = `Done Tagging (${waitTime})`;
+
+    if (waitTime <= 0) {
+      clearInterval(countdownInterval);
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Done Tagging";
     }
+  }, 1000);
+}
+
   </script>
 </body>
 </html>
