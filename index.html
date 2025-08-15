@@ -52,17 +52,19 @@
   transform: translateX(-50%);
   background: #333;
   color: #fff;
-  padding: 8px 14px; /* reduce padding */
+  padding: 8px 14px;       /* compact padding */
   border-radius: 6px;
-  font-size: 13px;   /* slightly smaller */
-  max-width: 90%;    /* responsive width */
-  white-space: nowrap; /* prevent wrapping */
-  overflow: hidden;
-  text-overflow: ellipsis; /* truncate if too long */
+  font-size: 13px;         /* smaller font */
+  max-width: 90%;          /* responsive width */
+  display: inline-block;   /* ensure compact height */
+  white-space: nowrap;     /* prevent wrapping */
+  overflow: hidden;        /* truncate overflow */
+  text-overflow: ellipsis; /* truncate text */
   opacity: 0.95;
   z-index: 10000;
   transition: opacity 0.5s ease;
 }
+
 
     .toast.success { background: #28a745; }
     .toast.error { background: #dc3545; }
