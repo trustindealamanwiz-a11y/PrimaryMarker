@@ -153,9 +153,8 @@
 
       <div class="form-step">Step 6 - Splice Splitter input</div>
       <div class="row actions">
-        <button type="submit" id="submitBtn" disabled>Tagging done</button>
+        <button type="submit" id="submitBtn" disabled>Tagging done <span id="countdown"></span></button>
         <br>
-        <span id="countdown" class="muted"></span>
         <span id="submitStatus" class="muted"></span>
       </div>
     </form>
@@ -336,12 +335,12 @@
       startBtn.disabled = true;
 
       let remaining = 60;
-      countdownEl.textContent = `Wait ${remaining} seconds...`;
+      countdownEl.textContent = `(${remaining}s)`;
       showToast("🕒 Please wait 60 seconds before submitting.", "info");
 
       const timer = setInterval(() => {
         remaining--;
-        countdownEl.textContent = `Wait ${remaining} seconds...`;
+        countdownEl.textContent = `(${remaining}s)`;
         if (remaining <= 0) {
           clearInterval(timer);
           submitBtn.disabled = false;
