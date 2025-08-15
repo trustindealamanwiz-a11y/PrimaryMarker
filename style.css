@@ -158,4 +158,10 @@ button:disabled {
         align-items: stretch;
     }
 }
+.form-step {
+  font-weight: bold;
+  margin: 15px 0 5px;
+  font-size: 1.1em;
+  text-decoration: underline;
+}
 
