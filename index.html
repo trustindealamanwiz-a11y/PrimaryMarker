@@ -29,6 +29,8 @@
 
       <!-- Hidden email field -->
       <input type="email" name="email" class="hidden" readonly required />
+      <!-- Start Tagging Time -->
+      <input type="hidden" name="startTime" />
 
       <!-- Auto Location / Manual Fallback -->
       <div id="locationRow" class="row hidden">
@@ -251,7 +253,8 @@
         wirecolor: form.wirecolor.value,
         linename: form.linename.value,
         drumno: form.drumno.value,
-        remark: form.remark.value
+        remark: form.remark.value,
+        startTime: form.startTime.value  // 🔹 new line
       };
 
       submitStatus.textContent = "Submitting...";
@@ -283,6 +286,9 @@ function startTagging() {
     const submitBtn = document.getElementById('submitBtn');
     submitBtn.disabled = true; // Start me disable hi rahega
 
+    // Save current timestamp in hidden field
+    document.querySelector('[name="startTime"]').value = new Date().toISOString();
+  
     // 60 seconds ke baad enable karo
     setTimeout(() => {
         submitBtn.disabled = false;
