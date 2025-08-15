@@ -193,7 +193,6 @@ button:disabled {
     align-items: center;
     z-index: 1000;
 }
-
 .spinner {
     width: 50px;
     height: 50px;
@@ -202,9 +201,7 @@ button:disabled {
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
 }
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
+@keyframes spin { to { transform: rotate(360deg); } }
 
 /* Mobile first */
 @media (max-width: 480px) {
@@ -250,4 +247,25 @@ button:disabled {
 @keyframes fadeIn {
     from { opacity: 0; transform: translate(-50%, -10px); }
     to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+/* Toast notification */
+.toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 14px 20px;
+    background: #27ae60;
+    color: white;
+    border-radius: 8px;
+    font-size: 15px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    animation: fadeIn 0.3s ease-in-out;
+    z-index: 2000;
+}
+.toast.error { background: #c0392b; }
+.fade-out { opacity: 0; transition: opacity 0.5s ease; }
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
