@@ -45,20 +45,25 @@
     }
 
     /* Toast notification */
-    .toast {
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #333;
-      color: #fff;
-      padding: 12px 20px;
-      border-radius: 6px;
-      font-size: 15px;
-      opacity: 0.95;
-      z-index: 10000;
-      transition: opacity 0.5s ease;
-    }
+.toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #333;
+  color: #fff;
+  padding: 8px 14px; /* reduce padding */
+  border-radius: 6px;
+  font-size: 13px;   /* slightly smaller */
+  max-width: 90%;    /* responsive width */
+  white-space: nowrap; /* prevent wrapping */
+  overflow: hidden;
+  text-overflow: ellipsis; /* truncate if too long */
+  opacity: 0.95;
+  z-index: 10000;
+  transition: opacity 0.5s ease;
+}
+
     .toast.success { background: #28a745; }
     .toast.error { background: #dc3545; }
     .toast.info { background: #007bff; }
