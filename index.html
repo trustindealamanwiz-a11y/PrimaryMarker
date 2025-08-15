@@ -13,6 +13,55 @@
       color: red;
       font-size: 14px;
     }
+
+    /* Spinner overlay */
+    .spinner-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(255,255,255,0.8);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid #ccc;
+      border-top-color: #28a745;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    .spinner-text {
+      margin-top: 12px;
+      font-size: 16px;
+      font-weight: 500;
+      color: #333;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Toast notification */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #333;
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 6px;
+      font-size: 15px;
+      opacity: 0.95;
+      z-index: 10000;
+      transition: opacity 0.5s ease;
+    }
+    .toast.success { background: #28a745; }
+    .toast.error { background: #dc3545; }
+    .toast.fade-out { opacity: 0; }
   </style>
 </head>
 <body>
@@ -26,7 +75,9 @@
     <div id="accessMsg" class="row muted">
       Please contact Admin if your id is not registred!
     </div>
-    <div id="deniedMsg" class="row error hidden">Access denied — Contact admin for allowing your mail ID !.</div>
+    <div id="deniedMsg" class="row error hidden">
+      Access denied — Contact admin for allowing your mail ID !.
+    </div>
   </div>
 
   <!-- Form card -->
@@ -34,7 +85,6 @@
     <div class="row muted" id="whoami"></div>
 
     <form id="dataForm">
-      
       <!-- Hidden email field -->
       <input type="email" name="email" class="hidden" readonly required />
       <!-- Start Tagging Time -->
@@ -62,13 +112,13 @@
       <!-- Step 3 -->
       <div class="form-step">Step 3 - Attach JC pick (Closeup with wire marking)</div>
       <div class="row">
-        <input type="file" name="photo1" accept="image/*" capture="environment" required placeholder="Upload JC Photo" />
+        <input type="file" name="photo1" accept="image/*" capture="environment" required />
       </div>
 
       <!-- Step 4 -->
       <div class="form-step">Step 4 - Attach location pick (Pole and area photo)</div>
       <div class="row">
-        <input type="file" name="photo2" accept="image/*" capture="environment" required placeholder="Upload Area Photo" />
+        <input type="file" name="photo2" accept="image/*" capture="environment" required />
       </div>
 
       <!-- Step 5 -->
@@ -154,19 +204,14 @@
     function handleCredentialResponse(response) {
       const payload = parseJwt(response.credential);
       const email = payload.email || "";
-      const formCard = document.getElementById("formCard");
-      const signinCard = document.getElementById("signinCard");
-      const deniedMsg = document.getElementById("deniedMsg");
-      const whoami = document.getElementById("whoami");
-
       if (allowedEmails.includes(email)) {
         document.querySelector('[name="email"]').value = email;
-        whoami.innerHTML = `Fiber line marking`;
-        deniedMsg.classList.add("hidden");
-        signinCard.classList.add("hidden");
-        formCard.classList.remove("hidden");
+        document.getElementById("whoami").innerHTML = `Fiber line marking`;
+        document.getElementById("deniedMsg").classList.add("hidden");
+        document.getElementById("signinCard").classList.add("hidden");
+        document.getElementById("formCard").classList.remove("hidden");
       } else {
-        deniedMsg.classList.remove("hidden");
+        document.getElementById("deniedMsg").classList.remove("hidden");
       }
     }
 
@@ -179,12 +224,10 @@
         pos => {
           const lat = pos.coords.latitude;
           const lng = pos.coords.longitude;
-          const link = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
-          document.querySelector("[name=locationLink]").value = link;
+          document.querySelector("[name=locationLink]").value =
+            `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
         },
-        () => {
-          document.getElementById("locationRow").classList.remove("hidden");
-        },
+        () => document.getElementById("locationRow").classList.remove("hidden"),
         { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
       );
     }
@@ -199,7 +242,7 @@
           img.onload = () => {
             const canvas = document.createElement("canvas");
             const ctx = canvas.getContext("2d");
-            const scale = Math.min(1, Math.sqrt((maxKB * 1024) / (file.size || (img.width * img.height)))); 
+            const scale = Math.min(1, Math.sqrt((maxKB * 1024) / (file.size || (img.width * img.height))));
             canvas.width = Math.max(1, Math.round(img.width * scale));
             canvas.height = Math.max(1, Math.round(img.height * scale));
             ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
@@ -218,86 +261,77 @@
     }
 
     async function onSubmit(e) {
-  e.preventDefault();
-  const form = e.target;
-  const submitStatus = document.getElementById("submitStatus");
+      e.preventDefault();
+      const form = e.target;
 
-  // Show spinner overlay
-  const overlay = document.createElement("div");
-  overlay.className = "spinner-overlay";
-  overlay.innerHTML = '<div class="spinner"></div><div class="spinner-text">Submitting...</div>';
-  document.body.appendChild(overlay);
+      // Spinner
+      const overlay = document.createElement("div");
+      overlay.className = "spinner-overlay";
+      overlay.innerHTML = '<div class="spinner"></div><div class="spinner-text">Submitting...</div>';
+      document.body.appendChild(overlay);
 
-  const photos = [];
-  const p1 = form.photo1.files[0];
-  const p2 = form.photo2.files[0];
+      const p1 = form.photo1.files[0];
+      const p2 = form.photo2.files[0];
+      if (!p1 || !p2) {
+        document.querySelector(".spinner-overlay")?.remove();
+        showToast("❌ Both JC Photo and Area Photo are required", "error");
+        return;
+      }
 
-  if (!p1 || !p2) {
-    document.querySelector(".spinner-overlay")?.remove();
-    showToast("❌ Both JC Photo and Area Photo are required", "error");
-    return;
-  }
+      let photos;
+      try {
+        photos = [await compressImageToDataURL(p1, 200), await compressImageToDataURL(p2, 200)];
+      } catch (err) {
+        document.querySelector(".spinner-overlay")?.remove();
+        showToast("❌ Image processing failed: " + err.message, "error");
+        return;
+      }
 
-  try {
-    photos.push(await compressImageToDataURL(p1, 200));
-    photos.push(await compressImageToDataURL(p2, 200));
-  } catch (err) {
-    document.querySelector(".spinner-overlay")?.remove();
-    showToast("❌ Image processing failed: " + err.message, "error");
-    return;
-  }
+      const payload = {
+        email: form.email.value,
+        locationLink: form.locationLink.value,
+        photos,
+        jcname: form.jcname.value,
+        splitter: form.splitter.value,
+        wire: form.wire.value,
+        wirecolor: form.wirecolor.value,
+        linename: form.linename.value,
+        drumno: form.drumno.value,
+        remark: form.remark.value,
+        startTime: form.startTime.value
+      };
 
-  const payload = {
-    email: form.email.value,
-    locationLink: form.locationLink.value,
-    photos,
-    jcname: form.jcname.value,
-    splitter: form.splitter.value,
-    wire: form.wire.value,
-    wirecolor: form.wirecolor.value,
-    linename: form.linename.value,
-    drumno: form.drumno.value,
-    remark: form.remark.value,
-    startTime: form.startTime.value
-  };
-
-  fetch(scriptURL, {
-    method: "POST",
-    headers: { "Content-Type": "text/plain;charset=utf-8" },
-    body: JSON.stringify(payload)
-  })
-  .then(r => r.json())
-  .then(resp => {
-    document.querySelector(".spinner-overlay")?.remove();
-    if (resp.status === "success") {
-      showToast("✅ Tagging submitted successfully!", "success");
-      setTimeout(() => {
-        window.location.reload(); // force Gmail login again
-      }, 2000);
-    } else {
-      showToast("❌ " + (resp.message || "Server error"), "error");
+      fetch(scriptURL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload)
+      })
+      .then(r => r.json())
+      .then(resp => {
+        document.querySelector(".spinner-overlay")?.remove();
+        if (resp.status === "success") {
+          showToast("✅ Tagging submitted successfully!", "success");
+          setTimeout(() => window.location.reload(), 2000);
+        } else {
+          showToast("❌ " + (resp.message || "Server error"), "error");
+        }
+      })
+      .catch(err => {
+        document.querySelector(".spinner-overlay")?.remove();
+        showToast("❌ Network error: " + err, "error");
+      });
     }
-  })
-  .catch(err => {
-    document.querySelector(".spinner-overlay")?.remove();
-    showToast("❌ Network error: " + err, "error");
-  });
-}
 
-// Toast notification
-function showToast(text, type) {
-  const toast = document.createElement("div");
-  toast.className = `toast ${type}`;
-  toast.textContent = text;
-  document.body.appendChild(toast);
-  setTimeout(() => {
-    toast.classList.add("fade-out");
-    setTimeout(() => toast.remove(), 500);
-  }, 3000);
-}
-
-
-    
+    function showToast(text, type) {
+      const toast = document.createElement("div");
+      toast.className = `toast ${type}`;
+      toast.textContent = text;
+      document.body.appendChild(toast);
+      setTimeout(() => {
+        toast.classList.add("fade-out");
+        setTimeout(() => toast.remove(), 500);
+      }, 3000);
+    }
   </script>
 </body>
 </html>
