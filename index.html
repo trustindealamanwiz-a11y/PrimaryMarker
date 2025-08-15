@@ -300,6 +300,21 @@
         }
       }, 1000);
     }
+
+
+    document.querySelector("form").addEventListener("submit", function(e) {
+    // Show spinner
+    const overlay = document.createElement("div");
+    overlay.className = "spinner-overlay";
+    overlay.innerHTML = '<div class="spinner"></div><p style="margin-top:10px;">Submitting...</p>';
+    document.body.appendChild(overlay);
+
+    // Disable all inputs
+    document.querySelectorAll("input, select, textarea, button").forEach(el => el.disabled = true);
+});
+
+
+    
   </script>
 </body>
 </html>
