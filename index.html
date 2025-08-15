@@ -332,6 +332,29 @@
         setTimeout(() => toast.remove(), 500);
       }, 3000);
     }
+
+function startTagging() {
+    const submitBtn = document.getElementById('submitBtn');
+    const startTimeField = document.querySelector('[name="startTime"]');
+
+    // Start time record
+    startTimeField.value = new Date().toISOString();
+
+    // Disable submit button
+    submitBtn.disabled = true;
+
+    // Toast message
+    showToast("🕒 Please wait 60 seconds before submitting.", "info");
+
+    // Enable after 60 seconds
+    setTimeout(() => {
+        submitBtn.disabled = false;
+        showToast("✅ You can now submit the form.", "success");
+    }, 60000);
+}
+
+
+    
   </script>
 </body>
 </html>
