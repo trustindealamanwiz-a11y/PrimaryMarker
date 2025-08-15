@@ -6,60 +6,82 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <link rel="stylesheet" href="style.css">
+<style>/* File input custom style with camera icon */
+input[type="file"] {
+  display: block;
+  padding: 8px;
+  border: 2px dashed #aaa;
+  border-radius: 8px;
+  background: #f9f9f9 url('https://cdn-icons-png.flaticon.com/512/685/685655.png') no-repeat 10px center;
+  background-size: 20px 20px;
+  padding-left: 40px;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
 
+input[type="file"]:hover {
+  border-color: #007bff;
+  background-color: #eef6ff;
+}
+
+input[type="file"]::-webkit-file-upload-button {
+  visibility: hidden;
+}
+
+input[type="file"]::before {
+  content: "📷 Choose Photo";
+  display: inline-block;
+  background: #007bff;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 5px;
+  font-size: 14px;
+  margin-right: 10px;
+  cursor: pointer;
+}
+
+input[type="file"]:hover::before {
+  background: #0056b3;
+}
+</style>
+  
 </head>
 <body>
-  <h2>Tag Splitter</h2>
+  <header>
+    <h2 class="page-title">Tag Splitter</h2>
+  </header>
 
   <!-- Sign-in card -->
   <div id="signinCard" class="card">
-    <div class="row">
+    <div class="row center">
       <div id="signinBtn"></div>
     </div>
-    <div id="accessMsg" class="row muted">
-      Please contact Admin if your id is not registred!
+    <div id="accessMsg" class="row muted small-text">
+      Please contact Admin if your ID is not registered!
     </div>
-    <div id="deniedMsg" class="row error hidden">Access denied — your email is not allowed.</div>
+    <div id="deniedMsg" class="row error hidden">
+      Access denied — Contact admin for allowing your mail ID!
+    </div>
   </div>
 
   <!-- Form card -->
   <div id="formCard" class="card hidden">
     <div class="row muted" id="whoami"></div>
-    <form id="dataForm">
 
-      <!-- Hidden email field -->
+    <form id="dataForm" class="form">
       <input type="email" name="email" class="hidden" readonly required />
+      <input type="hidden" name="startTime" />
 
-      <!-- Auto Location / Manual Fallback -->
+      <div class="form-step">Step 1 - Click on start Tagging</div>
       <div id="locationRow" class="row hidden">
-        <label>Location Link</label>
         <input type="text" name="locationLink" placeholder="Enter Google Maps Link" />
       </div>
+      <button type="button" id="startTaggingBtn" class="btn primary" onclick="startTagging()">Start Tagging</button>
 
-      <!-- JC Photo -->
-      <button type="button" id="startTaggingBtn" onclick="startTagging()">Start Tagging</button>
+      <div class="form-step">Step 2 - Break splitter input</div>
       <div class="row">
-        <label>JC Photo</label>
-        <input type="file" name="photo1" accept="image/*" capture="environment" required />
-      </div>
-
-      <!-- Area Photo -->
-      <div class="row">
-        <label>Area Photo</label>
-        <input type="file" name="photo2" accept="image/*" capture="environment" required />
-      </div>
-
-      <!-- JC Name -->
-      <div class="row">
-        <label>JC Name</label>
-        <input type="text" name="jcname" required />
-      </div>
-
-      <!-- Select Splitter -->
-      <div class="row">
-        <label>Select Splitter</label>
         <select name="splitter" required>
-          <option value="">-- Select --</option>
+          <option value="">Select Splitter</option>
           <option>2 way</option>
           <option>4 way</option>
           <option>8 way</option>
@@ -67,11 +89,23 @@
         </select>
       </div>
 
-      <!-- Select Wire -->
+      <div class="form-step">Step 3 - Attach JC pick</div>
       <div class="row">
-        <label>Select Wire</label>
+        <input type="file" name="photo1" accept="image/*" capture="environment" required />
+      </div>
+
+      <div class="form-step">Step 4 - Attach location pick</div>
+      <div class="row">
+        <input type="file" name="photo2" accept="image/*" capture="environment" required />
+      </div>
+
+      <div class="form-step">Step 5 - Fill line details</div>
+      <div class="row">
+        <input type="text" name="jcname" required placeholder="Enter JC Name" />
+      </div>
+      <div class="row">
         <select name="wire" required>
-          <option value="">-- Select --</option>
+          <option value="">Select Wire</option>
           <option>1 Core</option>
           <option>2 Core</option>
           <option>4 Core</option>
@@ -82,39 +116,31 @@
           <option>96 Core</option>
         </select>
       </div>
-
-      <!-- Wire Color -->
       <div class="row">
-        <label>Wire Color</label>
         <select name="wirecolor" required>
-          <option value="">-- Select --</option>
+          <option value="">Select Wire Color</option>
           <option>Black</option>
           <option>Orange</option>
           <option>Other</option>
         </select>
       </div>
-
-      <!-- Line Name -->
       <div class="row">
-        <label>Line Name (Optional)</label>
-        <input type="text" name="linename" />
+        <input type="text" name="linename" placeholder="Line Name (Optional)" />
       </div>
-
-      <!-- Drum No -->
       <div class="row">
-        <label>Drum No (Optional)</label>
-        <input type="text" name="drumno" />
+        <input type="text" name="drumno" placeholder="Drum No (Optional)" />
       </div>
-
-      <!-- Remark -->
       <div class="row">
-        <label>Remark</label>
         <textarea name="remark" placeholder="Write remarks..."></textarea>
       </div>
 
+      <div class="form-step">Step 6 - Splice Splitter input</div>
       <div class="row actions">
-        <button type="submit" id="submitBtn" disabled>Tagging done</button>
-        <span id="submitStatus" class="muted"></span>
+        <button type="submit" id="submitBtn" class="btn success" disabled>
+          Tagging done <span id="countdown"></span>
+        </button>
+        <br>
+        <span id="submitStatus" class="muted small-text"></span>
       </div>
     </form>
   </div>
@@ -155,19 +181,14 @@
     function handleCredentialResponse(response) {
       const payload = parseJwt(response.credential);
       const email = payload.email || "";
-      const formCard = document.getElementById("formCard");
-      const signinCard = document.getElementById("signinCard");
-      const deniedMsg = document.getElementById("deniedMsg");
-      const whoami = document.getElementById("whoami");
-
       if (allowedEmails.includes(email)) {
         document.querySelector('[name="email"]').value = email;
-        whoami.innerHTML = `Primary line marking`;
-        deniedMsg.classList.add("hidden");
-        signinCard.classList.add("hidden");
-        formCard.classList.remove("hidden");
+        document.getElementById("whoami").innerHTML = `Fiber line marking`;
+        document.getElementById("deniedMsg").classList.add("hidden");
+        document.getElementById("signinCard").classList.add("hidden");
+        document.getElementById("formCard").classList.remove("hidden");
       } else {
-        deniedMsg.classList.remove("hidden");
+        document.getElementById("deniedMsg").classList.remove("hidden");
       }
     }
 
@@ -180,12 +201,10 @@
         pos => {
           const lat = pos.coords.latitude;
           const lng = pos.coords.longitude;
-          const link = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
-          document.querySelector("[name=locationLink]").value = link;
+          document.querySelector("[name=locationLink]").value =
+            `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
         },
-        () => {
-          document.getElementById("locationRow").classList.remove("hidden");
-        },
+        () => document.getElementById("locationRow").classList.remove("hidden"),
         { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
       );
     }
@@ -221,23 +240,26 @@
     async function onSubmit(e) {
       e.preventDefault();
       const form = e.target;
-      const submitStatus = document.getElementById("submitStatus");
-      submitStatus.textContent = "Compressing images...";
 
-      const photos = [];
+      const overlay = document.createElement("div");
+      overlay.className = "spinner-overlay";
+      overlay.innerHTML = '<div class="spinner"></div><div class="spinner-text">Submitting...</div>';
+      document.body.appendChild(overlay);
+
       const p1 = form.photo1.files[0];
       const p2 = form.photo2.files[0];
-
       if (!p1 || !p2) {
-        alert("Both JC Photo and Area Photo are required.");
+        document.querySelector(".spinner-overlay")?.remove();
+        showToast("❌ Both JC Photo and Area Photo are required", "error");
         return;
       }
 
+      let photos;
       try {
-        photos.push(await compressImageToDataURL(p1, 200));
-        photos.push(await compressImageToDataURL(p2, 200));
+        photos = [await compressImageToDataURL(p1, 200), await compressImageToDataURL(p2, 200)];
       } catch (err) {
-        alert("Image processing failed: " + err.message);
+        document.querySelector(".spinner-overlay")?.remove();
+        showToast("❌ Image processing failed: " + err.message, "error");
         return;
       }
 
@@ -251,10 +273,10 @@
         wirecolor: form.wirecolor.value,
         linename: form.linename.value,
         drumno: form.drumno.value,
-        remark: form.remark.value
+        remark: form.remark.value,
+        startTime: form.startTime.value
       };
 
-      submitStatus.textContent = "Submitting...";
       fetch(scriptURL, {
         method: "POST",
         headers: { "Content-Type": "text/plain;charset=utf-8" },
@@ -262,34 +284,56 @@
       })
       .then(r => r.json())
       .then(resp => {
+        document.querySelector(".spinner-overlay")?.remove();
         if (resp.status === "success") {
-          submitStatus.textContent = "Submitted ✓";
-          form.reset();
-          document.querySelector('[name="email"]').value = payload.email;
-          alert("Data submitted successfully!");
+          showToast("✅ Tagging submitted successfully!", "success");
+          setTimeout(() => window.location.reload(), 2000);
         } else {
-          submitStatus.textContent = "";
-          alert("Error from server: " + (resp.message || "Unknown error"));
+          showToast("❌ " + (resp.message || "Server error"), "error");
         }
       })
       .catch(err => {
-        submitStatus.textContent = "";
-        alert("Network error: " + err);
+        document.querySelector(".spinner-overlay")?.remove();
+        showToast("❌ Network error: " + err, "error");
       });
     }
 
+    function showToast(text, type) {
+      const toast = document.createElement("div");
+      toast.className = `toast ${type}`;
+      toast.textContent = text;
+      document.body.appendChild(toast);
+      setTimeout(() => {
+        toast.classList.add("fade-out");
+        setTimeout(() => toast.remove(), 500);
+      }, 3000);
+    }
 
-function startTagging() {
-    const submitBtn = document.getElementById('submitBtn');
-    submitBtn.disabled = true; // Start me disable hi rahega
+    function startTagging() {
+      const submitBtn = document.getElementById('submitBtn');
+      const startTimeField = document.querySelector('[name="startTime"]');
+      const countdownEl = document.getElementById('countdown');
+      const startBtn = document.getElementById('startTaggingBtn');
 
-    // 60 seconds ke baad enable karo
-    setTimeout(() => {
-        submitBtn.disabled = false;
-    }, 60000);
-}
+      startTimeField.value = new Date().toISOString();
+      submitBtn.disabled = true;
+      startBtn.disabled = true;
 
-    
+      let remaining = 60;
+      countdownEl.textContent = `(${remaining}s)`;
+      showToast("🕒 Please wait 60 seconds before submitting.", "info");
+
+      const timer = setInterval(() => {
+        remaining--;
+        countdownEl.textContent = `(${remaining}s)`;
+        if (remaining <= 0) {
+          clearInterval(timer);
+          submitBtn.disabled = false;
+          countdownEl.textContent = "";
+          showToast("✅ You can now submit the form.", "success");
+        }
+      }, 1000);
+    }
   </script>
 </body>
 </html>
