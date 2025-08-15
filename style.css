@@ -211,6 +211,30 @@ button:disabled {
 }
 
 /* -------------------
+   Custom File Input
+-------------------- */
+.custom-file-label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 16px;
+    background: var(--primary);
+    color: white;
+    font-weight: 500;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: background var(--transition), transform var(--transition);
+}
+.custom-file-label:hover {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+}
+.custom-file-label:active {
+    transform: translateY(0);
+}
+
+/* -------------------
    Spinner overlay
 -------------------- */
 .spinner-overlay {
