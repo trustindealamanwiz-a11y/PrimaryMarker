@@ -211,43 +211,40 @@ button:disabled {
 }
 
 /* -------------------
-   Custom File Input
+   Custom File Input (Camera Button)
 -------------------- */
 input[type="file"] {
-    position: relative;
-    width: 100%;
-    max-width: 300px;
-    padding: 35px 0;
-    border: 2px dashed #ccc;
-    border-radius: var(--border-radius);
-    background: #f9f9f9;
-    cursor: pointer;
-    color: transparent; /* hides default text like "No file chosen" */
-    text-align: center;
+    display: none; /* hide default input */
 }
 
-input[type="file"]::-webkit-file-upload-button {
-    visibility: hidden;
-}
-
-input[type="file"]::before {
-    content: "📷 Click Photo";
-    color: white;
+.custom-file-label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 14px 20px;
     background: var(--primary);
-    padding: 8px 14px;
+    color: white;
+    font-weight: 500;
     border-radius: var(--border-radius);
-    font-size: 14px;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
     cursor: pointer;
-    white-space: nowrap;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    transition: background var(--transition), transform var(--transition);
+    font-size: 15px;
+    user-select: none;
 }
 
-input[type="file"]:hover::before {
+.custom-file-label::before {
+    content: "📷";
+    font-size: 18px;
+}
+
+.custom-file-label:hover {
     background: var(--primary-dark);
+    transform: translateY(-1px);
+}
+
+.custom-file-label:active {
+    transform: translateY(0);
 }
 
 /* -------------------
@@ -330,6 +327,7 @@ input[type="file"]:hover::before {
     .actions { flex-direction: column; align-items: stretch; }
     button { font-size: 18px; padding: 14px; }
     .step-card { padding: 12px; }
+    .custom-file-label { padding: 16px; font-size: 16px; }
 }
 @media (min-width: 768px) {
     .two-column {
