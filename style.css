@@ -176,54 +176,6 @@ button:disabled {
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* -------------------
-   Message box & Toast
--------------------- */
-.message-box {
-    position: fixed;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 14px 20px;
-    border-radius: 8px;
-    color: white;
-    font-size: 16px;
-    z-index: 2000;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-    animation: fadeIn 0.3s ease-in-out;
-}
-.message-box.success { background-color: var(--success); }
-.message-box.error { background-color: var(--error); }
-
-.toast {
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #333;
-  color: #fff;
-  padding: 8px 14px;       /* compact padding */
-  border-radius: 6px;
-  font-size: 13px;         /* smaller font */
-  max-width: 90%;          /* responsive width */
-  display: inline-block;   /* ensure compact height */
-  white-space: nowrap;     /* prevent wrapping */
-  overflow: hidden;        /* truncate overflow */
-  text-overflow: ellipsis; /* truncate text */
-  opacity: 0.95;
-  z-index: 10000;
-  transition: opacity 0.5s ease;
-}
-
-}
-.toast.error { background: var(--error); }
-
-.fade-out { opacity: 0; transition: opacity 0.5s ease; }
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
 
 /* -------------------
    Responsive Layouts
