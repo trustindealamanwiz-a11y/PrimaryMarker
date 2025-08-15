@@ -41,34 +41,29 @@
 
       <!-- Auto Location / Manual Fallback -->
       <div id="locationRow" class="row hidden">
-        <label>Location Link</label>
         <input type="text" name="locationLink" placeholder="Enter Google Maps Link" />
       </div>
 
       <!-- JC Photo -->
       <button type="button" id="startTaggingBtn" onclick="startTagging()">Start Tagging</button>
       <div class="row">
-        <label>JC Photo</label>
-        <input type="file" name="photo1" accept="image/*" capture="environment" required />
+        <input type="file" name="photo1" accept="image/*" capture="environment" required placeholder="Upload JC Photo" />
       </div>
 
       <!-- Area Photo -->
       <div class="row">
-        <label>Area Photo</label>
-        <input type="file" name="photo2" accept="image/*" capture="environment" required />
+        <input type="file" name="photo2" accept="image/*" capture="environment" required placeholder="Upload Area Photo" />
       </div>
 
       <!-- JC Name -->
       <div class="row">
-        <label>JC Name</label>
-        <input type="text" name="jcname" required />
+        <input type="text" name="jcname" required placeholder="Enter JC Name" />
       </div>
 
       <!-- Select Splitter -->
       <div class="row">
-        <label>Select Splitter</label>
         <select name="splitter" required>
-          <option value="">-- Select --</option>
+          <option value="">Select Splitter</option>
           <option>2 way</option>
           <option>4 way</option>
           <option>8 way</option>
@@ -78,9 +73,8 @@
 
       <!-- Select Wire -->
       <div class="row">
-        <label>Select Wire</label>
         <select name="wire" required>
-          <option value="">-- Select --</option>
+          <option value="">Select Wire</option>
           <option>1 Core</option>
           <option>2 Core</option>
           <option>4 Core</option>
@@ -94,9 +88,8 @@
 
       <!-- Wire Color -->
       <div class="row">
-        <label>Wire Color</label>
         <select name="wirecolor" required>
-          <option value="">-- Select --</option>
+          <option value="">Select Wire Color</option>
           <option>Black</option>
           <option>Orange</option>
           <option>Other</option>
@@ -105,26 +98,23 @@
 
       <!-- Line Name -->
       <div class="row">
-        <label>Line Name (Optional)</label>
-        <input type="text" name="linename" />
+        <input type="text" name="linename" placeholder="Line Name (Optional)" />
       </div>
 
       <!-- Drum No -->
       <div class="row">
-        <label>Drum No (Optional)</label>
-        <input type="text" name="drumno" />
+        <input type="text" name="drumno" placeholder="Drum No (Optional)" />
       </div>
 
       <!-- Remark -->
       <div class="row">
-        <label>Remark</label>
         <textarea name="remark" placeholder="Write remarks..."></textarea>
       </div>
 
       <div class="row actions">
         <button type="submit" id="submitBtn" disabled>Tagging done</button>
         <br>
-        <span id="countdown" class="muted"></span> <!-- Timer ab directly niche -->
+        <span id="countdown" class="muted"></span>
         <span id="submitStatus" class="muted"></span>
       </div>
     </form>
@@ -290,32 +280,28 @@
       });
     }
 
-  function startTagging() {
-  const submitBtn = document.getElementById('submitBtn');
-  const startBtn = document.getElementById('startTaggingBtn');
+    function startTagging() {
+      const submitBtn = document.getElementById('submitBtn');
+      const startBtn = document.getElementById('startTaggingBtn');
 
-  // Disable start button
-  startBtn.disabled = true;
-  startBtn.textContent = "Tagging Started...";
+      startBtn.disabled = true;
+      startBtn.textContent = "Tagging Started...";
 
-  // Disable submit button initially with countdown
-  let waitTime = 10; // seconds
-  submitBtn.disabled = true;
-  submitBtn.textContent = `Done Tagging (${waitTime})`;
+      let waitTime = 10;
+      submitBtn.disabled = true;
+      submitBtn.textContent = `Done Tagging (${waitTime})`;
 
-  // Countdown timer inside button
-  const countdownInterval = setInterval(() => {
-    waitTime--;
-    submitBtn.textContent = `Done Tagging (${waitTime})`;
+      const countdownInterval = setInterval(() => {
+        waitTime--;
+        submitBtn.textContent = `Done Tagging (${waitTime})`;
 
-    if (waitTime <= 0) {
-      clearInterval(countdownInterval);
-      submitBtn.disabled = false;
-      submitBtn.textContent = "Done Tagging";
+        if (waitTime <= 0) {
+          clearInterval(countdownInterval);
+          submitBtn.disabled = false;
+          submitBtn.textContent = "Done Tagging";
+        }
+      }, 1000);
     }
-  }, 1000);
-}
-
   </script>
 </body>
 </html>
