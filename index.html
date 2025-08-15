@@ -6,21 +6,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <link rel="stylesheet" href="style.css">
-  
 </head>
 <body>
-  <h2>Tag Splitter</h2>
+  <header>
+    <h2 class="page-title">Tag Splitter</h2>
+  </header>
 
   <!-- Sign-in card -->
   <div id="signinCard" class="card">
-    <div class="row">
+    <div class="row center">
       <div id="signinBtn"></div>
     </div>
-    <div id="accessMsg" class="row muted">
-      Please contact Admin if your id is not registred!
+    <div id="accessMsg" class="row muted small-text">
+      Please contact Admin if your ID is not registered!
     </div>
     <div id="deniedMsg" class="row error hidden">
-      Access denied — Contact admin for allowing your mail ID !.
+      Access denied — Contact admin for allowing your mail ID!
     </div>
   </div>
 
@@ -28,7 +29,7 @@
   <div id="formCard" class="card hidden">
     <div class="row muted" id="whoami"></div>
 
-    <form id="dataForm">
+    <form id="dataForm" class="form">
       <input type="email" name="email" class="hidden" readonly required />
       <input type="hidden" name="startTime" />
 
@@ -36,9 +37,9 @@
       <div id="locationRow" class="row hidden">
         <input type="text" name="locationLink" placeholder="Enter Google Maps Link" />
       </div>
-      <button type="button" id="startTaggingBtn" onclick="startTagging()">Start Tagging</button>
+      <button type="button" id="startTaggingBtn" class="btn primary" onclick="startTagging()">Start Tagging</button>
 
-      <div class="form-step">Step 2 - Break splitter input (Select only one splitter)</div>
+      <div class="form-step">Step 2 - Break splitter input</div>
       <div class="row">
         <select name="splitter" required>
           <option value="">Select Splitter</option>
@@ -49,17 +50,17 @@
         </select>
       </div>
 
-      <div class="form-step">Step 3 - Attach JC pick (Closeup with wire marking)</div>
+      <div class="form-step">Step 3 - Attach JC pick</div>
       <div class="row">
         <input type="file" name="photo1" accept="image/*" capture="environment" required />
       </div>
 
-      <div class="form-step">Step 4 - Attach location pick (Pole and area photo)</div>
+      <div class="form-step">Step 4 - Attach location pick</div>
       <div class="row">
         <input type="file" name="photo2" accept="image/*" capture="environment" required />
       </div>
 
-      <div class="form-step">Step 5 - Fill line details below</div>
+      <div class="form-step">Step 5 - Fill line details</div>
       <div class="row">
         <input type="text" name="jcname" required placeholder="Enter JC Name" />
       </div>
@@ -96,9 +97,11 @@
 
       <div class="form-step">Step 6 - Splice Splitter input</div>
       <div class="row actions">
-        <button type="submit" id="submitBtn" disabled>Tagging done <span id="countdown"></span></button>
+        <button type="submit" id="submitBtn" class="btn success" disabled>
+          Tagging done <span id="countdown"></span>
+        </button>
         <br>
-        <span id="submitStatus" class="muted"></span>
+        <span id="submitStatus" class="muted small-text"></span>
       </div>
     </form>
   </div>
