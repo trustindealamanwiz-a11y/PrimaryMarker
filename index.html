@@ -1,178 +1,293 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tag Splitter</title>
-<style>
-  body { font-family: Arial, sans-serif; margin: 20px; }
-  .hidden { display: none; }
-  form { max-width: 500px; margin: auto; }
-  label { display: block; margin-top: 15px; font-weight: bold; }
-  input, select, textarea, button { width: 100%; padding: 8px; margin-top: 5px; }
-  button { background-color: #4CAF50; color: white; border: none; cursor: pointer; }
-  button:hover { background-color: #45a049; }
-</style>
-<script src="https://accounts.google.com/gsi/client" async defer></script>
+  <meta charset="UTF-8" />
+  <title>Tag Splitter</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; max-width: 720px; margin: 24px auto; padding: 0 16px; }
+    h2 { margin-top: 0; }
+    .card { border: 1px solid #ddd; border-radius: 12px; padding: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+    .row { margin: 10px 0; }
+    input, select, textarea, button { font-size: 16px; padding: 8px; }
+    input[type="text"], input[type="email"], select, textarea { width: 100%; box-sizing: border-box; }
+    textarea { min-height: 90px; }
+    .hidden { display: none; }
+    .muted { color: #666; font-size: 14px; }
+    .error { color: #c00; margin-top: 8px; }
+    .ok { color: #0a0; }
+    .actions { display: flex; gap: 8px; align-items: center; }
+  </style>
 </head>
 <body>
+  <h2>Tag Splitter</h2>
 
-<h2>Tag Splitter</h2>
-<div id="signin-section">
-  <div id="g_id_onload"
-    data-client_id="YOUR_GOOGLE_CLIENT_ID"
-    data-callback="handleCredentialResponse">
-  </div>
-  <div class="g_id_signin" data-type="standard"></div>
-  <p>Only allowed emails can access the form.<br>Please contact Admin if your ID is not registered!</p>
-</div>
-
-<div id="form-section" class="hidden">
-  <h3>Primary line marking</h3>
-  <form id="dataForm">
-    <input type="hidden" id="email" name="email">
-
-    <div id="locationInputContainer" class="hidden">
-      <label for="locationLink">Location Link</label>
-      <input type="url" id="locationLink" name="locationLink" placeholder="Enter Google Maps link" required>
+  <!-- Sign-in card -->
+  <div id="signinCard" class="card">
+    <div class="row">
+      <div id="signinBtn"></div>
     </div>
+    <div id="accessMsg" class="row muted">
+      Please contact Admin if your id is not registred!
+    </div>
+    <div id="deniedMsg" class="row error hidden">Access denied — your email is not allowed.</div>
+  </div>
 
-    <label>JC Photo (Required)</label>
-    <input type="file" id="photo1" accept="image/*" capture="environment" required>
+  <!-- Form card -->
+  <div id="formCard" class="card hidden">
+    <div class="row muted" id="whoami"></div>
+    <form id="dataForm">
 
-    <label>Area Photo (Required)</label>
-    <input type="file" id="photo2" accept="image/*" capture="environment" required>
+      <!-- Hidden email field -->
+      <input type="email" name="email" class="hidden" readonly required />
 
-    <label>JC Name</label>
-    <input type="text" id="jcName" name="jcName" required>
+      <!-- Auto Location / Manual Fallback -->
+      <div id="locationRow" class="row hidden">
+        <label>Location Link</label>
+        <input type="text" name="locationLink" placeholder="Enter Google Maps Link" />
+      </div>
 
-    <label>Select Splitter</label>
-    <select id="splitter" name="splitter" required>
-      <option value="">-- Select --</option>
-      <option>2 way</option>
-      <option>4 way</option>
-      <option>8 way</option>
-      <option>16 way</option>
-    </select>
+      <!-- JC Photo -->
+      <div class="row">
+        <label>JC Photo</label>
+        <input type="file" name="photo1" accept="image/*" capture="environment" required />
+      </div>
 
-    <label>Select Wire</label>
-    <select id="wire" name="wire" required>
-      <option value="">-- Select --</option>
-      <option>1 Core</option>
-      <option>2 Core</option>
-      <option>4 Core</option>
-      <option>6 Core</option>
-      <option>12 Core</option>
-      <option>24 Core</option>
-      <option>48 Core</option>
-      <option>96 Core</option>
-    </select>
+      <!-- Area Photo -->
+      <div class="row">
+        <label>Area Photo</label>
+        <input type="file" name="photo2" accept="image/*" capture="environment" required />
+      </div>
 
-    <label>Wire Color</label>
-    <select id="wireColor" name="wireColor" required>
-      <option value="">-- Select --</option>
-      <option>Black</option>
-      <option>Orange</option>
-      <option>Other</option>
-    </select>
+      <!-- JC Name -->
+      <div class="row">
+        <label>JC Name</label>
+        <input type="text" name="jcname" required />
+      </div>
 
-    <label>Line Name (Optional)</label>
-    <input type="text" id="lineName" name="lineName">
+      <!-- Select Splitter -->
+      <div class="row">
+        <label>Select Splitter</label>
+        <select name="splitter" required>
+          <option value="">-- Select --</option>
+          <option>2 way</option>
+          <option>4 way</option>
+          <option>8 way</option>
+          <option>16 way</option>
+        </select>
+      </div>
 
-    <label>Drum No (Optional)</label>
-    <input type="text" id="drumNo" name="drumNo">
+      <!-- Select Wire -->
+      <div class="row">
+        <label>Select Wire</label>
+        <select name="wire" required>
+          <option value="">-- Select --</option>
+          <option>1 Core</option>
+          <option>2 Core</option>
+          <option>4 Core</option>
+          <option>6 Core</option>
+          <option>12 Core</option>
+          <option>24 Core</option>
+          <option>48 Core</option>
+          <option>96 Core</option>
+        </select>
+      </div>
 
-    <label>Remarks</label>
-    <textarea id="remark" name="remark"></textarea>
+      <!-- Wire Color -->
+      <div class="row">
+        <label>Wire Color</label>
+        <select name="wirecolor" required>
+          <option value="">-- Select --</option>
+          <option>Black</option>
+          <option>Orange</option>
+          <option>Other</option>
+        </select>
+      </div>
 
-    <button type="submit">Submit</button>
-  </form>
-</div>
+      <!-- Line Name -->
+      <div class="row">
+        <label>Line Name (Optional)</label>
+        <input type="text" name="linename" />
+      </div>
 
-<script>
-const ALLOWED_EMAILS = ["trustindeal.amanwiz@gmail.com"]; // Allowed email list
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyb0CI0mL5nkHmLjYm_AYwgZyhcmefGGJ85NAvsLrbQGLa-oaoy0no_q0A9Ky-PIqh6kw/exec";
+      <!-- Drum No -->
+      <div class="row">
+        <label>Drum No (Optional)</label>
+        <input type="text" name="drumno" />
+      </div>
 
-function handleCredentialResponse(response) {
-  const data = parseJwt(response.credential);
-  if (ALLOWED_EMAILS.includes(data.email)) {
-    document.getElementById("signin-section").classList.add("hidden");
-    document.getElementById("form-section").classList.remove("hidden");
-    document.getElementById("email").value = data.email;
-    detectLocation();
-  } else {
-    alert("Access denied. Please contact Admin.");
-  }
-}
+      <!-- Remark -->
+      <div class="row">
+        <label>Remark</label>
+        <textarea name="remark" placeholder="Write remarks..."></textarea>
+      </div>
 
-function parseJwt(token) {
-  const base64Url = token.split('.')[1];
-  const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-  const jsonPayload = decodeURIComponent(atob(base64).split('').map(c =>
-    '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
-  ).join(''));
-  return JSON.parse(jsonPayload);
-}
+      <div class="row actions">
+        <button type="submit">Submit</button>
+        <span id="submitStatus" class="muted"></span>
+      </div>
+    </form>
+  </div>
 
-function detectLocation() {
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(pos => {
-      const lat = pos.coords.latitude;
-      const lon = pos.coords.longitude;
-      document.getElementById("locationLink").value =
-        `https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}`;
-    }, err => {
-      document.getElementById("locationInputContainer").classList.remove("hidden");
-    });
-  } else {
-    document.getElementById("locationInputContainer").classList.remove("hidden");
-  }
-}
+  <script>
+    const allowedEmails = ["shahzebahmad2024@gmail.com", "trustindeal.amanwiz@gmail.com"];
+    const scriptURL = "https://script.google.com/macros/s/AKfycbyb0CI0mL5nkHmLjYm_AYwgZyhcmefGGJ85NAvsLrbQGLa-oaoy0no_q0A9Ky-PIqh6kw/exec";
+    const clientID = "599836800018-6df1f03d2l70q5aoncd0s3b99j72je38.apps.googleusercontent.com";
 
-document.getElementById("dataForm").addEventListener("submit", async function(e) {
-  e.preventDefault();
-  try {
-    const formData = {
-      email: document.getElementById("email").value,
-      locationLink: document.getElementById("locationLink").value,
-      photo1: await toBase64(document.getElementById("photo1").files[0]),
-      photo2: await toBase64(document.getElementById("photo2").files[0]),
-      jcName: document.getElementById("jcName").value,
-      splitter: document.getElementById("splitter").value,
-      wire: document.getElementById("wire").value,
-      wireColor: document.getElementById("wireColor").value,
-      lineName: document.getElementById("lineName").value,
-      drumNo: document.getElementById("drumNo").value,
-      remark: document.getElementById("remark").value
+    window.onload = () => {
+      if (window.google && google.accounts && google.accounts.id) {
+        google.accounts.id.initialize({
+          client_id: clientID,
+          callback: handleCredentialResponse
+        });
+        google.accounts.id.renderButton(
+          document.getElementById("signinBtn"),
+          { theme: "outline", size: "large", type: "standard", shape: "pill" }
+        );
+      }
+      document.getElementById("dataForm").addEventListener("submit", onSubmit);
+      autoDetectLocation();
     };
 
-    const res = await fetch(SCRIPT_URL, {
-      method: "POST",
-      body: JSON.stringify(formData),
-      headers: { "Content-Type": "application/json" }
-    });
-
-    const result = await res.json();
-    if (result.status === "success") {
-      alert("Data submitted successfully!");
-      document.getElementById("dataForm").reset();
-    } else {
-      alert("Error: " + result.message);
+    function parseJwt(token) {
+      try {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(atob(base64).split('').map(c =>
+          '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+        ).join(''));
+        return JSON.parse(jsonPayload);
+      } catch {
+        return {};
+      }
     }
-  } catch (err) {
-    alert("Network error: " + err.message);
-  }
-});
 
-function toBase64(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = error => reject(error);
-  });
-}
-</script>
+    function handleCredentialResponse(response) {
+      const payload = parseJwt(response.credential);
+      const email = payload.email || "";
+      const formCard = document.getElementById("formCard");
+      const signinCard = document.getElementById("signinCard");
+      const deniedMsg = document.getElementById("deniedMsg");
+      const whoami = document.getElementById("whoami");
 
+      if (allowedEmails.includes(email)) {
+        document.querySelector('[name="email"]').value = email;
+        whoami.innerHTML = `Primary line marking`;
+        deniedMsg.classList.add("hidden");
+        signinCard.classList.add("hidden");
+        formCard.classList.remove("hidden");
+      } else {
+        deniedMsg.classList.remove("hidden");
+      }
+    }
+
+    function autoDetectLocation() {
+      if (!navigator.geolocation) {
+        document.getElementById("locationRow").classList.remove("hidden");
+        return;
+      }
+      navigator.geolocation.getCurrentPosition(
+        pos => {
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+          const link = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+          document.querySelector("[name=locationLink]").value = link;
+        },
+        () => {
+          document.getElementById("locationRow").classList.remove("hidden");
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      );
+    }
+
+    function compressImageToDataURL(file, maxKB = 200) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onerror = () => reject(new Error("Failed to read file"));
+        reader.onload = () => {
+          const img = new Image();
+          img.onerror = () => reject(new Error("Invalid image"));
+          img.onload = () => {
+            const canvas = document.createElement("canvas");
+            const ctx = canvas.getContext("2d");
+            const scale = Math.min(1, Math.sqrt((maxKB * 1024) / (file.size || (img.width * img.height))));
+            canvas.width = Math.max(1, Math.round(img.width * scale));
+            canvas.height = Math.max(1, Math.round(img.height * scale));
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            let quality = 0.75;
+            let dataUrl = canvas.toDataURL("image/jpeg", quality);
+            while (dataUrl.length / 1024 > maxKB && quality > 0.2) {
+              quality -= 0.05;
+              dataUrl = canvas.toDataURL("image/jpeg", quality);
+            }
+            resolve(dataUrl);
+          };
+          img.src = reader.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function onSubmit(e) {
+      e.preventDefault();
+      const form = e.target;
+      const submitStatus = document.getElementById("submitStatus");
+      submitStatus.textContent = "Compressing images...";
+
+      const photos = [];
+      const p1 = form.photo1.files[0];
+      const p2 = form.photo2.files[0];
+
+      if (!p1 || !p2) {
+        alert("Both JC Photo and Area Photo are required.");
+        return;
+      }
+
+      try {
+        photos.push(await compressImageToDataURL(p1, 200));
+        photos.push(await compressImageToDataURL(p2, 200));
+      } catch (err) {
+        alert("Image processing failed: " + err.message);
+        return;
+      }
+
+      const payload = {
+        email: form.email.value,
+        locationLink: form.locationLink.value,
+        photos,
+        jcname: form.jcname.value,
+        splitter: form.splitter.value,
+        wire: form.wire.value,
+        wirecolor: form.wirecolor.value,
+        linename: form.linename.value,
+        drumno: form.drumno.value,
+        remark: form.remark.value
+      };
+
+      submitStatus.textContent = "Submitting...";
+      fetch(scriptURL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload)
+      })
+      .then(r => r.json())
+      .then(resp => {
+        if (resp.status === "success") {
+          submitStatus.textContent = "Submitted ✓";
+          form.reset();
+          document.querySelector('[name="email"]').value = payload.email;
+          alert("Data submitted successfully!");
+        } else {
+          submitStatus.textContent = "";
+          alert("Error from server: " + (resp.message || "Unknown error"));
+        }
+      })
+      .catch(err => {
+        submitStatus.textContent = "";
+        alert("Network error: " + err);
+      });
+    }
+  </script>
 </body>
 </html>
