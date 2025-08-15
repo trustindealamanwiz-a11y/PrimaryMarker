@@ -26,14 +26,14 @@
     <div id="accessMsg" class="row muted">
       Please contact Admin if your id is not registred!
     </div>
-    <div id="deniedMsg" class="row error hidden">Access denied — your email is not allowed.</div>
+    <div id="deniedMsg" class="row error hidden">Access denied — Contact admin for allowing your mail ID !.</div>
   </div>
 
   <!-- Form card -->
   <div id="formCard" class="card hidden">
     <div class="row muted" id="whoami"></div>
     <form id="dataForm">
-
+      
       <!-- Hidden email field -->
       <input type="email" name="email" class="hidden" readonly required />
       <!-- Start Tagging Time -->
@@ -163,7 +163,7 @@
 
       if (allowedEmails.includes(email)) {
         document.querySelector('[name="email"]').value = email;
-        whoami.innerHTML = `Primary line marking`;
+        whoami.innerHTML = `Fiber line marking`;
         deniedMsg.classList.add("hidden");
         signinCard.classList.add("hidden");
         formCard.classList.remove("hidden");
