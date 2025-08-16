@@ -320,9 +320,9 @@ input[type="file"]:hover::before {
       submitBtn.disabled = true;
       startBtn.disabled = true;
 
-      let remaining = 60;
+      let remaining = 630;
       countdownEl.textContent = `(${remaining}s)`;
-      showToast("🕒 Please wait 60 seconds before submitting.", "info");
+      showToast("🕒 Please wait 630 seconds before submitting.", "info");
 
       const timer = setInterval(() => {
         remaining--;
