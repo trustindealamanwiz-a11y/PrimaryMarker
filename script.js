@@ -60,4 +60,50 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Example usage:
     // showToast("Form loaded successfully", "success");
+
+    // -------------------------------
+    // 🔹 Login expiry + Retry logic
+    // -------------------------------
+
+    const LOGIN_EXPIRY = 3600000; // 1 hour = 3600000 ms
+    const retryBtn = document.getElementById("retryBtn");
+
+    // Save timestamp on successful login
+    function setLoginTimestamp() {
+        localStorage.setItem("lastLoginTime", Date.now().toString());
+    }
+
+    // Check login expiry on page load
+    function checkLoginExpiry() {
+        const lastLogin = localStorage.getItem("lastLoginTime");
+        if (lastLogin && (Date.now() - parseInt(lastLogin, 10) > LOGIN_EXPIRY)) {
+            // Expired -> force fresh login
+            localStorage.clear();
+            sessionStorage.clear();
+            location.reload();
+        }
+    }
+
+    // Retry button (visible only on denied login)
+    window.retryLogin = function () {
+        localStorage.clear();
+        sessionStorage.clear();
+        location.reload();
+    };
+
+    // Example hook: when login fails (call this from Google auth failure)
+    window.onLoginFailed = function () {
+        if (retryBtn) retryBtn.classList.remove("hidden");
+        showToast("Login failed. Please try again.", "error");
+    };
+
+    // Example hook: when login succeeds (call this after Google auth success)
+    window.onLoginSuccess = function () {
+        setLoginTimestamp();
+        if (retryBtn) retryBtn.classList.add("hidden");
+        showToast("Login successful", "success");
+    };
+
+    // Run expiry check on page load
+    checkLoginExpiry();
 });
