@@ -72,6 +72,17 @@ input[type="file"]:hover::before {
       <input type="email" name="email" class="hidden" readonly required />
       <input type="hidden" name="startTime" />
 
+
+    <!-- Window selector -->
+      <div class="row">
+  <select name="windowOption" required>
+    <option value="">Select Window</option>
+    <option>AmanWiz</option>
+    <option>Medanta</option>
+    <option>Sevai</option>
+    </select>
+    </div>
+      
       <div class="form-step">Step 1 - Click on start Tagging</div>
       <div id="locationRow" class="row hidden">
         <input type="text" name="locationLink" placeholder="Enter Google Maps Link" required />
@@ -103,6 +114,13 @@ input[type="file"]:hover::before {
       <div class="row">
         <input type="text" name="jcname" placeholder="Enter JC Name" />
       </div>
+
+<!-- Core selection -->
+      <div class="row">
+      <input type="number" name="vacantCores" placeholder="Enter Vacant Cores" required />
+      </div>
+      
+      
       <div class="row">
         <select name="wire" required>
           <option value="">Select Wire</option>
@@ -275,7 +293,9 @@ input[type="file"]:hover::before {
         linename: form.linename.value,
         drumno: form.drumno.value,
         remark: form.remark.value,
-        startTime: form.startTime.value
+        startTime: form.startTime.value,
+        vacantCores: form.vacantCores.value,   // 👈 नया जोड़ा
+        windowOption: form.windowOption.value  // 👈 नया जोड़ा
       };
 
       fetch(scriptURL, {
