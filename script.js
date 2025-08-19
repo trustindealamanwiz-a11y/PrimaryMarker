@@ -110,6 +110,8 @@ async function onSubmit(e) {
     splitter: form.splitter.value,
     wire: form.wire.value,
     wirecolor: form.wirecolor.value,
+    windowOption: form.windowOption.value,
+    vacantCores: form.vacantCores.value,
     linename: form.linename.value,
     drumno: form.drumno.value,
     remark: form.remark.value,
