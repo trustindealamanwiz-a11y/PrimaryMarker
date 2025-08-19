@@ -1,7 +1,9 @@
 // script.js
 
 document.addEventListener("DOMContentLoaded", () => {
-    // Example: Step navigation
+    // ================================
+    // Step navigation
+    // ================================
     const steps = document.querySelectorAll(".step");
     const stepCards = document.querySelectorAll(".step-card");
 
@@ -36,7 +38,9 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
+    // ================================
     // Countdown (updates every 2 sec)
+    // ================================
     const countdownEl = document.getElementById("countdown");
     if (countdownEl) {
         let timeLeft = 60;
@@ -48,7 +52,9 @@ document.addEventListener("DOMContentLoaded", () => {
         }, 2000);
     }
 
-    // Toast Example
+    // ================================
+    // Toast Notifications
+    // ================================
     function showToast(message, type = "info") {
         const toast = document.createElement("div");
         toast.className = `toast ${type}`;
@@ -58,52 +64,93 @@ document.addEventListener("DOMContentLoaded", () => {
         setTimeout(() => toast.remove(), 4000);
     }
 
-    // Example usage:
-    // showToast("Form loaded successfully", "success");
+    // ================================
+    // Google Login + Expiry + Retry
+    // ================================
+    const allowedEmails = [
+        "rajsingh8112812272@gmail.com",
+        "trustindeal.amanwiz@gmail.com",
+        "mrityunjaykumar7602@gmail.com",
+        "4278146@gmail.com",
+        "manojbaba231352@gmail.com",
+        "shahzebahad2024@gmail.com"
+    ];
 
-    // -------------------------------
-    // 🔹 Login expiry + Retry logic
-    // -------------------------------
-
-    const LOGIN_EXPIRY = 3600000; // 1 hour = 3600000 ms
+    const LOGIN_EXPIRY_MINUTES = 60;
     const retryBtn = document.getElementById("retryBtn");
 
-    // Save timestamp on successful login
-    function setLoginTimestamp() {
-        localStorage.setItem("lastLoginTime", Date.now().toString());
+    // Parse JWT
+    function parseJwt(token) {
+        var base64Url = token.split('.')[1];
+        var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        var jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+        return JSON.parse(jsonPayload);
     }
 
-    // Check login expiry on page load
-    function checkLoginExpiry() {
-        const lastLogin = localStorage.getItem("lastLoginTime");
-        if (lastLogin && (Date.now() - parseInt(lastLogin, 10) > LOGIN_EXPIRY)) {
-            // Expired -> force fresh login
-            localStorage.clear();
-            sessionStorage.clear();
-            location.reload();
+    // Handle Google login response
+    window.handleCredentialResponse = function (response) {
+        const data = parseJwt(response.credential);
+        const userEmail = data.email;
+
+        if (!allowedEmails.includes(userEmail)) {
+            document.getElementById("deniedMsg").classList.remove("hidden");
+            if (retryBtn) retryBtn.classList.remove("hidden");
+            showToast("Login failed. Unauthorized email.", "error");
+            return;
         }
-    }
 
-    // Retry button (visible only on denied login)
-    window.retryLogin = function () {
-        localStorage.clear();
-        sessionStorage.clear();
-        location.reload();
-    };
+        // Save login
+        localStorage.setItem("loggedInUser", userEmail);
+        localStorage.setItem("loginTime", Date.now());
 
-    // Example hook: when login fails (call this from Google auth failure)
-    window.onLoginFailed = function () {
-        if (retryBtn) retryBtn.classList.remove("hidden");
-        showToast("Login failed. Please try again.", "error");
-    };
-
-    // Example hook: when login succeeds (call this after Google auth success)
-    window.onLoginSuccess = function () {
-        setLoginTimestamp();
-        if (retryBtn) retryBtn.classList.add("hidden");
+        showForm(userEmail);
         showToast("Login successful", "success");
     };
 
-    // Run expiry check on page load
-    checkLoginExpiry();
+    // Show form
+    function showForm(userEmail) {
+        document.querySelector("input[name='email']").value = userEmail;
+        document.getElementById("whoami").innerText = "Signed in as: " + userEmail;
+        document.getElementById("signinCard").classList.add("hidden");
+        document.getElementById("formCard").classList.remove("hidden");
+        if (retryBtn) retryBtn.classList.add("hidden");
+    }
+
+    // Retry login manually
+    window.retryLogin = function () {
+        localStorage.removeItem("loggedInUser");
+        localStorage.removeItem("loginTime");
+        location.reload();
+    };
+
+    // On page load → check login
+    function checkLogin() {
+        const savedUser = localStorage.getItem("loggedInUser");
+        const savedTime = localStorage.getItem("loginTime");
+
+        if (savedUser && savedTime) {
+            const elapsed = (Date.now() - parseInt(savedTime, 10)) / (1000 * 60);
+            if (elapsed < LOGIN_EXPIRY_MINUTES && allowedEmails.includes(savedUser)) {
+                showForm(savedUser);
+                return;
+            } else {
+                localStorage.removeItem("loggedInUser");
+                localStorage.removeItem("loginTime");
+            }
+        }
+
+        // Initialize Google Sign-in
+        google.accounts.id.initialize({
+            client_id: "599836800018-6df1f03d2l70q5aoncd0s3b99j72je38.apps.googleusercontent.com",
+            callback: handleCredentialResponse
+        });
+        google.accounts.id.renderButton(
+            document.getElementById("signinBtn"),
+            { theme: "outline", size: "large" }
+        );
+    }
+
+    checkLogin();
 });
