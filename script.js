@@ -1,4 +1,4 @@
-const allowedEmails = ["shahzebahmad2024@gmail.com", "trustindeal.amanwiz@gmail.com"];
+const allowedEmails = ["shahzebahmad2024@gmail.com", "rajsingh8112812272@gmail.com", "trustindeal.amanwiz@gmail.com", "mrityunjaykumar7602@gmail.com", "4278146@gmail.com", "manojbaba231352@gmail.com"];
 const scriptURL = "https://script.google.com/macros/s/AKfycbyb0CI0mL5nkHmLjYm_AYwgZyhcmefGGJ85NAvsLrbQGLa-oaoy0no_q0A9Ky-PIqh6kw/exec";
 const clientID = "599836800018-6df1f03d2l70q5aoncd0s3b99j72je38.apps.googleusercontent.com";
 
