@@ -33,7 +33,14 @@
     <form id="dataForm" class="form">
       <input type="email" name="email" class="hidden" readonly required />
       <input type="hidden" name="startTime" />
-
+      <div class="row">
+        <select name="windowOption" required>
+          <option value="">Select Window</option>
+          <option>AmanWiz</option>
+          <option>Medanta</option>
+          <option>Sevai</option>
+        </select>
+      </div>
       <div class="form-step">Step 1 - Click on start Tagging</div>
       <div id="locationRow" class="row hidden">
         <input type="text" name="locationLink" placeholder="Enter Google Maps Link" />
@@ -85,6 +92,10 @@
           <option>Orange</option>
           <option>Other</option>
         </select>
+      </div>
+
+      <div class="row">
+        <input type="text" name="vacantCores" placeholder="Enter Vacant Core" />
       </div>
       <div class="row">
         <input type="text" name="linename" placeholder="Line Name (Optional)" />
