@@ -158,4 +158,28 @@ document.addEventListener("DOMContentLoaded", () => {
 console.log("Login response:", data);
 console.log("User email:", userEmail);
 
+window.handleLogin = function(response) {
+    console.log("Raw login response:", response);
+
+    const data = jwt_decode(response.credential);
+    console.log("Decoded JWT data:", data);
+
+    const userEmail = data.email;
+    console.log("Extracted Email:", userEmail);
+
+    if (allowedEmails.includes(userEmail)) {
+        console.log("✅ Email allowed, proceeding with login");
+        onLoginSuccess();
+        document.getElementById("signinCard").classList.add("hidden");
+        document.getElementById("formCard").classList.remove("hidden");
+        document.querySelector("[name='email']").value = userEmail;
+        document.getElementById("whoami").textContent = `Signed in as ${userEmail}`;
+    } else {
+        console.warn("❌ Email not in allowed list");
+        document.getElementById("deniedMsg").classList.remove("hidden");
+        document.getElementById("accessMsg").classList.add("hidden");
+        onLoginFailed();
+    }
+};
+
 
