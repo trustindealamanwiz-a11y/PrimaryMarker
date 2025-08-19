@@ -336,3 +336,59 @@ input[type="file"] {
         gap: 12px;
     }
 }
+
+/* File input custom style with camera icon */
+input[type="file"] {
+  display: block;
+  padding: 8px;
+  border: 2px dashed #aaa;
+  border-radius: 8px;
+  background: #f9f9f9 url('https://cdn-icons-png.flaticon.com/512/685/685655.png') no-repeat 10px center;
+  background-size: 20px 20px;
+  padding-left: 40px;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+input[type="file"]:hover {
+  border-color: #007bff;
+  background-color: #eef6ff;
+}
+
+input[type="file"]::-webkit-file-upload-button {
+  visibility: hidden;
+}
+
+input[type="file"]::before {
+  content: "📷 Choose Photo";
+  display: inline-block;
+  background: #007bff;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 5px;
+  font-size: 14px;
+  margin-right: 10px;
+  cursor: pointer;
+}
+
+input[type="file"]:hover::before {
+  background: #0056b3;
+}
+
+.center {
+  text-align: center;
+}
+
+.small-text {
+  font-size: 12px;
+}
+
+.page-title {
+  text-align: center;
+}
+
+.form-step {
+  font-weight: bold;
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
