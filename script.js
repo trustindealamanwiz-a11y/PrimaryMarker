@@ -154,3 +154,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     checkLogin();
 });
+
+console.log("Login response:", data);
+console.log("User email:", userEmail);
+
+
