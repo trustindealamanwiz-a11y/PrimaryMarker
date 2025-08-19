@@ -10,17 +10,18 @@
 <body>
   <header>
     <h1 class="page-title">Tag Splitter</h1>
-    <div id="deniedMsg" class="row error hidden">
-      Access denied — Contact admin to register your mail id with virtual backoffice!  
-      <button type="button" class="btn retry hidden" id="retryBtn" onclick="retryLogin()">Try Again</button>
-    </div>
   </header>
 
   <!-- Sign-in card -->
   <div id="signinCard" class="card">
     <div class="row center"><div id="signinBtn"></div></div>
     <div id="accessMsg" class="row muted small-text">Please contact Admin if your ID is not registered!</div>
-    <div id="deniedMsg" class="row error hidden">Access denied — Contact admin for register your mail id with virtual backoffice !</div>
+    
+    <!-- single deniedMsg block with retry button -->
+    <div id="deniedMsg" class="row error hidden">
+      Access denied — Contact admin to register your mail id with virtual backoffice!  
+      <button type="button" class="btn retry hidden" id="retryBtn" onclick="retryLogin()">Try Again</button>
+    </div>
   </div>
 
   <!-- Form card -->
@@ -108,12 +109,18 @@
     window.onload = function () {
       google.accounts.id.initialize({
         client_id: "599836800018-6df1f03d2l70q5aoncd0s3b99j72je38.apps.googleusercontent.com",
-        callback: handleCredentialResponse
+        callback: handleCredentialResponse,
+        auto_select: true
       });
       google.accounts.id.renderButton(
         document.getElementById("signinBtn"),
         { theme: "outline", size: "large" }
       );
+
+      const savedEmail = localStorage.getItem("userEmail");
+      if (savedEmail && allowedEmails.includes(savedEmail)) {
+        autoLogin(savedEmail);
+      }
     };
 
     function handleCredentialResponse(response) {
@@ -122,13 +129,25 @@
 
       if (!allowedEmails.includes(userEmail)) {
         document.getElementById("deniedMsg").classList.remove("hidden");
+        document.getElementById("retryBtn").classList.remove("hidden");
         return;
       }
 
+      localStorage.setItem("userEmail", userEmail);
+      autoLogin(userEmail);
+    }
+
+    function autoLogin(userEmail) {
       document.querySelector("input[name='email']").value = userEmail;
       document.getElementById("whoami").innerText = "Signed in as: " + userEmail;
       document.getElementById("signinCard").classList.add("hidden");
       document.getElementById("formCard").classList.remove("hidden");
+      document.getElementById("deniedMsg").classList.add("hidden");
+    }
+
+    function retryLogin() {
+      localStorage.removeItem("userEmail");
+      window.location.reload();
     }
 
     function parseJwt(token) {
