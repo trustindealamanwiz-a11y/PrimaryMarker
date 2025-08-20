@@ -176,31 +176,44 @@ function startTagging() {
   }, 2000);
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  const loggedInEmail = localStorage.getItem('loggedInEmail');
-  const loginTime = localStorage.getItem('loginTime');
-  const oneHour = 3600000;
+//document.addEventListener('DOMContentLoaded', () => {
+  //const loggedInEmail = localStorage.getItem('loggedInEmail');
+  //const loginTime = localStorage.getItem('loginTime');
+  //const oneHour = 3600000;
 
-  if (loggedInEmail && loginTime && (Date.now() - loginTime < oneHour) && allowedEmails.includes(loggedInEmail)) {
-    document.querySelector('[name="email"]').value = loggedInEmail;
-    document.getElementById("whoami").innerHTML = `Fiber line marking`;
-    document.getElementById("signinCard").classList.add("hidden");
-    document.getElementById("formCard").classList.remove("hidden");
-  } else {
-    if (window.google && google.accounts && google.accounts.id) {
-      google.accounts.id.initialize({
-        client_id: clientID,
-        callback: handleCredentialResponse
-      });
-      google.accounts.id.renderButton(
-        document.getElementById("signinBtn"),
-        { theme: "outline", size: "large", type: "standard", shape: "pill" }
-      );
-    }
-  }
+  //if (loggedInEmail && loginTime && (Date.now() - loginTime < oneHour) && allowedEmails.includes(loggedInEmail)) {
+    //document.querySelector('[name="email"]').value = loggedInEmail;
+    //document.getElementById("whoami").innerHTML = `Fiber line marking`;
+    //document.getElementById("signinCard").classList.add("hidden");
+    //document.getElementById("formCard").classList.remove("hidden");
+  //} else {
+    //if (window.google && google.accounts && google.accounts.id) {
+     // google.accounts.id.initialize({
+       // client_id: clientID,
+       // callback: handleCredentialResponse
+      //});
+      //google.accounts.id.renderButton(
+       // document.getElementById("signinBtn"),
+        //{ theme: "outline", size: "large", type: "standard", shape: "pill" }
+      //);
+    //}
+ // }
+
+  //document.getElementById("dataForm").addEventListener("submit", onSubmit);
+  //autoDetectLocation();
+
+//DIRECT LOGING CODE START
+document.addEventListener('DOMContentLoaded', () => {
+  // Direct form visible
+  document.getElementById("signinCard").classList.add("hidden");
+  document.getElementById("formCard").classList.remove("hidden");
+  document.getElementById("whoami").innerHTML = `Fiber line marking`;
 
   document.getElementById("dataForm").addEventListener("submit", onSubmit);
   autoDetectLocation();
+});
+// DIRECT LOGIN CODE ENDS
+
 
   const reloginBtn = document.getElementById("reloginBtn");
   if (reloginBtn) {
