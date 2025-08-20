@@ -6,45 +6,45 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <link rel="stylesheet" href="style.css">
-<style>/* File input custom style with camera icon */
-input[type="file"] {
-  display: block;
-  padding: 8px;
-  border: 2px dashed #aaa;
-  border-radius: 8px;
-  background: #f9f9f9 url('https://cdn-icons-png.flaticon.com/512/685/685655.png') no-repeat 10px center;
-  background-size: 20px 20px;
-  padding-left: 40px;
-  cursor: pointer;
-  transition: 0.3s ease;
-}
+  <style>
+    /* File input custom style with camera icon */
+    input[type="file"] {
+      display: block;
+      padding: 8px;
+      border: 2px dashed #aaa;
+      border-radius: 8px;
+      background: #f9f9f9 url('https://cdn-icons-png.flaticon.com/512/685/685655.png') no-repeat 10px center;
+      background-size: 20px 20px;
+      padding-left: 40px;
+      cursor: pointer;
+      transition: 0.3s ease;
+    }
 
-input[type="file"]:hover {
-  border-color: #007bff;
-  background-color: #eef6ff;
-}
+    input[type="file"]:hover {
+      border-color: #007bff;
+      background-color: #eef6ff;
+    }
 
-input[type="file"]::-webkit-file-upload-button {
-  visibility: hidden;
-}
+    input[type="file"]::-webkit-file-upload-button {
+      visibility: hidden;
+    }
 
-input[type="file"]::before {
-  content: "📷 Choose Photo";
-  display: inline-block;
-  background: #007bff;
-  color: white;
-  padding: 6px 12px;
-  border-radius: 5px;
-  font-size: 14px;
-  margin-right: 10px;
-  cursor: pointer;
-}
+    input[type="file"]::before {
+      content: "📷 Choose Photo";
+      display: inline-block;
+      background: #007bff;
+      color: white;
+      padding: 6px 12px;
+      border-radius: 5px;
+      font-size: 14px;
+      margin-right: 10px;
+      cursor: pointer;
+    }
 
-input[type="file"]:hover::before {
-  background: #0056b3;
-}
-</style>
-  
+    input[type="file"]:hover::before {
+      background: #0056b3;
+    }
+  </style>
 </head>
 <body>
   <header>
@@ -71,14 +71,14 @@ input[type="file"]:hover::before {
     <form id="dataForm" class="form">
       <input type="email" name="email" class="hidden" readonly required />
       <input type="hidden" name="startTime" />
-<div class="row">
-  <select name="windowoption" required>
-    <option value="">Select Window</option>
-    <option>AmanWiz</option>
-    <option>Medanta</option>
-    <option>Sevai</option>
-  </select>
-</div>
+      <div class="row">
+        <select name="windowoption" required>
+          <option value="">Select Window</option>
+          <option>AmanWiz</option>
+          <option>Medanta</option>
+          <option>Sevai</option>
+        </select>
+      </div>
       <div class="form-step">Step 1 - Click on start Tagging</div>
       <div id="locationRow" class="row hidden">
         <input type="text" name="locationLink" placeholder="Enter Google Maps Link" />
@@ -110,24 +110,22 @@ input[type="file"]:hover::before {
       <div class="row">
         <input type="text" name="jcname" required placeholder="Enter JC Name" />
       </div>
-<div class="row">
-  <select name="wire" required>
-    <option value="">Select Wire</option>
-    <option>1 Core</option>
-    <option>2 Core</option>
-    <option>4 Core</option>
-    <option>6 Core</option>
-    <option>12 Core</option>
-    <option>24 Core</option>
-    <option>48 Core</option>
-    <option>96 Core</option>
-  </select>
-</div>
-
-<div class="row">
-  <input type="number" name="vacantcores" required placeholder="Enter Vacant Cores" />
-</div>
-
+      <div class="row">
+        <select name="wire" required>
+          <option value="">Select Wire</option>
+          <option>1 Core</option>
+          <option>2 Core</option>
+          <option>4 Core</option>
+          <option>6 Core</option>
+          <option>12 Core</option>
+          <option>24 Core</option>
+          <option>48 Core</option>
+          <option>96 Core</option>
+        </select>
+      </div>
+      <div class="row">
+        <input type="number" name="vacantcores" required placeholder="Enter Vacant Cores" />
+      </div>
       <div class="row">
         <select name="wirecolor" required>
           <option value="">Select Wire Color</option>
@@ -161,17 +159,31 @@ input[type="file"]:hover::before {
     const allowedEmails = ["shahzebahmad2024@gmail.com", "rajsingh8112812272@gmail.com", "trustindeal.amanwiz@gmail.com", "4278146@gmail.com", "manojbaba231352@gmail.com"];
     const scriptURL = "https://script.google.com/macros/s/AKfycbyb0CI0mL5nkHmLjYm_AYwgZyhcmefGGJ85NAvsLrbQGLa-oaoy0no_q0A9Ky-PIqh6kw/exec";
     const clientID = "599836800018-6df1f03d2l70q5aoncd0s3b99j72je38.apps.googleusercontent.com";
+    const ONE_HOUR = 60 * 60 * 1000; // 1 hour in milliseconds
 
     window.onload = () => {
-      if (window.google && google.accounts && google.accounts.id) {
-        google.accounts.id.initialize({
-          client_id: clientID,
-          callback: handleCredentialResponse
-        });
-        google.accounts.id.renderButton(
-          document.getElementById("signinBtn"),
-          { theme: "outline", size: "large", type: "standard", shape: "pill" }
-        );
+      // Check for saved session
+      const savedSession = JSON.parse(localStorage.getItem("userSession"));
+      if (savedSession && Date.now() - savedSession.timestamp < ONE_HOUR && allowedEmails.includes(savedSession.email)) {
+        document.querySelector('[name="email"]').value = savedSession.email;
+        document.getElementById("whoami").innerHTML = `Fiber line marking`;
+        document.getElementById("signinCard").classList.add("hidden");
+        document.getElementById("formCard").classList.remove("hidden");
+        console.log("Auto-login with saved email:", savedSession.email);
+      } else {
+        // Remove expired or invalid session
+        localStorage.removeItem("userSession");
+        // Initialize Google Sign-In
+        if (window.google && google.accounts && google.accounts.id) {
+          google.accounts.id.initialize({
+            client_id: clientID,
+            callback: handleCredentialResponse
+          });
+          google.accounts.id.renderButton(
+            document.getElementById("signinBtn"),
+            { theme: "outline", size: "large", type: "standard", shape: "pill" }
+          );
+        }
       }
       document.getElementById("dataForm").addEventListener("submit", onSubmit);
       autoDetectLocation();
@@ -194,11 +206,17 @@ input[type="file"]:hover::before {
       const payload = parseJwt(response.credential);
       const email = payload.email || "";
       if (allowedEmails.includes(email)) {
+        // Save session to localStorage
+        localStorage.setItem("userSession", JSON.stringify({
+          email: email,
+          timestamp: Date.now()
+        }));
         document.querySelector('[name="email"]').value = email;
         document.getElementById("whoami").innerHTML = `Fiber line marking`;
         document.getElementById("deniedMsg").classList.add("hidden");
         document.getElementById("signinCard").classList.add("hidden");
         document.getElementById("formCard").classList.remove("hidden");
+        console.log("Login successful, session saved for 1 hr");
       } else {
         document.getElementById("deniedMsg").classList.remove("hidden");
       }
@@ -286,8 +304,8 @@ input[type="file"]:hover::before {
         linename: form.linename.value,
         drumno: form.drumno.value,
         remark: form.remark.value,
-        vacantcores: form.vacantcores.value,     // ✅ new
-        windowoption: form.windowoption.value,   // ✅ new
+        vacantcores: form.vacantcores.value,
+        windowoption: form.windowoption.value,
         startTime: form.startTime.value
       };
 
@@ -347,52 +365,7 @@ input[type="file"]:hover::before {
           showToast("✅ You can now submit the form.", "success");
         }
       }, 1000);
-    }    
-  </script>
-
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  const loginCard = document.getElementById("signinCard");
-  const formCard = document.getElementById("formCard");
-  const emailInput = document.querySelector("input[name='email']");
-
-  const ONE_HOUR = 60 * 60 * 1000; // 1 hour in milliseconds
-
-  // Check saved email in localStorage
-  const savedSession = JSON.parse(localStorage.getItem("userSession"));
-  if (savedSession) {
-    const now = Date.now();
-    if (now - savedSession.timestamp < ONE_HOUR) {
-      // Session is still valid
-      emailInput.value = savedSession.email; // auto-fill email
-      loginCard.classList.add("hidden");
-      formCard.classList.remove("hidden");
-      console.log("Auto-login with saved email:", savedSession.email);
-    } else {
-      // Session expired
-      localStorage.removeItem("userSession");
     }
-  }
-
-  // When login form is submitted
-  document.getElementById("signinForm").addEventListener("submit", (e) => {
-    e.preventDefault();
-    const email = emailInput.value;
-
-    // Save email + timestamp
-    localStorage.setItem("userSession", JSON.stringify({
-      email: email,
-      timestamp: Date.now()
-    }));
-
-    // Show form card directly
-    loginCard.classList.add("hidden");
-    formCard.classList.remove("hidden");
-    console.log("Login successful, session saved for 1 hr");
-  });
-});
-</script>
-
-  
+  </script>
 </body>
 </html>
