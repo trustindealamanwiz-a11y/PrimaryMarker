@@ -1,4 +1,3 @@
-const allowedEmails = ["shahzebahmad2024@gmail.com", "rajsingh8112812272@gmail.com", "trustindeal.amanwiz@gmail.com", "mrityunjaykumar7602@gmail.com", "4278146@gmail.com", "manojbaba231352@gmail.com"];
 const scriptURL = "https://script.google.com/macros/s/AKfycbyb0CI0mL5nkHmLjYm_AYwgZyhcmefGGJ85NAvsLrbQGLa-oaoy0no_q0A9Ky-PIqh6kw/exec";
 const clientID = "599836800018-6df1f03d2l70q5aoncd0s3b99j72je38.apps.googleusercontent.com";
 
@@ -18,17 +17,16 @@ function parseJwt(token) {
 function handleCredentialResponse(response) {
   const payload = parseJwt(response.credential);
   const email = payload.email || "";
-  if (allowedEmails.includes(email)) {
-    document.querySelector('[name="email"]').value = email;
-    document.getElementById("whoami").innerHTML = `Fiber line marking`;
-    document.getElementById("deniedMsg").classList.add("hidden");
-    document.getElementById("signinCard").classList.add("hidden");
-    document.getElementById("formCard").classList.remove("hidden");
-    localStorage.setItem('loggedInEmail', email);
-    localStorage.setItem('loginTime', Date.now());
-  } else {
-    document.getElementById("deniedMsg").classList.remove("hidden");
-  }
+
+  // Koi bhi email aa jaye allow kar do
+  document.querySelector('[name="email"]').value = email;
+  document.getElementById("whoami").innerHTML = "Fiber line marking";
+  document.getElementById("deniedMsg").classList.add("hidden");
+  document.getElementById("signinCard").classList.add("hidden");
+  document.getElementById("formCard").classList.remove("hidden");
+
+  localStorage.setItem('loggedInEmail', email);
+  localStorage.setItem('loginTime', Date.now());
 }
 
 function autoDetectLocation() {
@@ -62,6 +60,7 @@ function compressImageToDataURL(file, maxKB = 500) {
         canvas.width = Math.max(1, Math.round(img.width * scale));
         canvas.height = Math.max(1, Math.round(img.height * scale));
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
         let quality = 0.75;
         let dataUrl = canvas.toDataURL("image/jpeg", quality);
         while (dataUrl.length / 1024 > maxKB && quality > 0.2) {
@@ -87,6 +86,7 @@ async function onSubmit(e) {
 
   const p1 = form.photo1.files[0];
   const p2 = form.photo2.files[0];
+
   if (!p1 || !p2) {
     document.querySelector(".spinner-overlay")?.remove();
     showToast("❌ Both JC Photo and Area Photo are required", "error");
@@ -95,7 +95,10 @@ async function onSubmit(e) {
 
   let photos;
   try {
-    photos = [await compressImageToDataURL(p1, 500), await compressImageToDataURL(p2, 500)];
+    photos = [
+      await compressImageToDataURL(p1, 500),
+      await compressImageToDataURL(p2, 500)
+    ];
   } catch (err) {
     document.querySelector(".spinner-overlay")?.remove();
     showToast("❌ Image processing failed: " + err.message, "error");
@@ -123,20 +126,20 @@ async function onSubmit(e) {
     headers: { "Content-Type": "text/plain;charset=utf-8" },
     body: JSON.stringify(payload)
   })
-  .then(r => r.json())
-  .then(resp => {
-    document.querySelector(".spinner-overlay")?.remove();
-    if (resp.status === "success") {
-      showToast("✅ Tagging submitted successfully!", "success");
-      setTimeout(() => window.location.reload(), 2000);
-    } else {
-      showToast("❌ " + (resp.message || "Server error"), "error");
-    }
-  })
-  .catch(err => {
-    document.querySelector(".spinner-overlay")?.remove();
-    showToast("❌ Network error: " + err, "error");
-  });
+    .then(r => r.json())
+    .then(resp => {
+      document.querySelector(".spinner-overlay")?.remove();
+      if (resp.status === "success") {
+        showToast("✅ Tagging submitted successfully!", "success");
+        setTimeout(() => window.location.reload(), 2000);
+      } else {
+        showToast("❌ " + (resp.message || "Server error"), "error");
+      }
+    })
+    .catch(err => {
+      document.querySelector(".spinner-overlay")?.remove();
+      showToast("❌ Network error: " + err, "error");
+    });
 }
 
 function showToast(text, type) {
@@ -155,8 +158,8 @@ function startTagging() {
   const startTimeField = document.querySelector('[name="startTime"]');
   const countdownEl = document.getElementById('countdown');
   const startBtn = document.getElementById('startTaggingBtn');
-  const timerStart = Date.now();
 
+  const timerStart = Date.now();
   startTimeField.value = new Date().toISOString();
   submitBtn.disabled = true;
   startBtn.disabled = true;
@@ -176,50 +179,19 @@ function startTagging() {
   }, 2000);
 }
 
-//document.addEventListener('DOMContentLoaded', () => {
-  //const loggedInEmail = localStorage.getItem('loggedInEmail');
-  //const loginTime = localStorage.getItem('loginTime');
-  //const oneHour = 3600000;
-
-  //if (loggedInEmail && loginTime && (Date.now() - loginTime < oneHour) && allowedEmails.includes(loggedInEmail)) {
-    //document.querySelector('[name="email"]').value = loggedInEmail;
-    //document.getElementById("whoami").innerHTML = `Fiber line marking`;
-    //document.getElementById("signinCard").classList.add("hidden");
-    //document.getElementById("formCard").classList.remove("hidden");
-  //} else {
-    //if (window.google && google.accounts && google.accounts.id) {
-     // google.accounts.id.initialize({
-       // client_id: clientID,
-       // callback: handleCredentialResponse
-      //});
-      //google.accounts.id.renderButton(
-       // document.getElementById("signinBtn"),
-        //{ theme: "outline", size: "large", type: "standard", shape: "pill" }
-      //);
-    //}
- // }
-
-  //document.getElementById("dataForm").addEventListener("submit", onSubmit);
-  //autoDetectLocation();
-
-//DIRECT LOGING CODE START
+// DIRECT LOGIN (skip email check)
 document.addEventListener('DOMContentLoaded', () => {
-  // Direct form visible
   document.getElementById("signinCard").classList.add("hidden");
   document.getElementById("formCard").classList.remove("hidden");
-  document.getElementById("whoami").innerHTML = `Fiber line marking`;
-
+  document.getElementById("whoami").innerHTML = "Fiber line marking";
   document.getElementById("dataForm").addEventListener("submit", onSubmit);
   autoDetectLocation();
 });
-// DIRECT LOGIN CODE ENDS
 
-
-  const reloginBtn = document.getElementById("reloginBtn");
-  if (reloginBtn) {
-    reloginBtn.addEventListener('click', () => {
-      google.accounts.id.prompt();
-      document.getElementById("deniedMsg").classList.add("hidden");
-    });
-  }
-});
+const reloginBtn = document.getElementById("reloginBtn");
+if (reloginBtn) {
+  reloginBtn.addEventListener('click', () => {
+    google.accounts.id.prompt();
+    document.getElementById("deniedMsg").classList.add("hidden");
+  });
+}
