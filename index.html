@@ -71,7 +71,14 @@ input[type="file"]:hover::before {
     <form id="dataForm" class="form">
       <input type="email" name="email" class="hidden" readonly required />
       <input type="hidden" name="startTime" />
-
+<div class="row">
+  <select name="windowoption" required>
+    <option value="">Select Window</option>
+    <option>AmanWiz</option>
+    <option>Medanta</option>
+    <option>Sevai</option>
+  </select>
+</div>
       <div class="form-step">Step 1 - Click on start Tagging</div>
       <div id="locationRow" class="row hidden">
         <input type="text" name="locationLink" placeholder="Enter Google Maps Link" />
@@ -115,6 +122,11 @@ input[type="file"]:hover::before {
           <option>48 Core</option>
           <option>96 Core</option>
         </select>
+
+          <div class="row">
+          <input type="number" name="vacantcores" required placeholder="Enter Vacant Cores" />
+          </div>
+        
       </div>
       <div class="row">
         <select name="wirecolor" required>
@@ -274,6 +286,8 @@ input[type="file"]:hover::before {
         linename: form.linename.value,
         drumno: form.drumno.value,
         remark: form.remark.value,
+        vacantcores: form.vacantcores.value,     // ✅ new
+        windowoption: form.windowoption.value,   // ✅ new
         startTime: form.startTime.value
       };
 
