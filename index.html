@@ -347,7 +347,52 @@ input[type="file"]:hover::before {
           showToast("✅ You can now submit the form.", "success");
         }
       }, 1000);
-    }
+    }    
   </script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const loginCard = document.getElementById("signinCard");
+  const formCard = document.getElementById("formCard");
+  const emailInput = document.querySelector("input[name='email']");
+
+  const ONE_HOUR = 60 * 60 * 1000; // 1 hour in milliseconds
+
+  // Check saved email in localStorage
+  const savedSession = JSON.parse(localStorage.getItem("userSession"));
+  if (savedSession) {
+    const now = Date.now();
+    if (now - savedSession.timestamp < ONE_HOUR) {
+      // Session is still valid
+      emailInput.value = savedSession.email; // auto-fill email
+      loginCard.classList.add("hidden");
+      formCard.classList.remove("hidden");
+      console.log("Auto-login with saved email:", savedSession.email);
+    } else {
+      // Session expired
+      localStorage.removeItem("userSession");
+    }
+  }
+
+  // When login form is submitted
+  document.getElementById("signinForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const email = emailInput.value;
+
+    // Save email + timestamp
+    localStorage.setItem("userSession", JSON.stringify({
+      email: email,
+      timestamp: Date.now()
+    }));
+
+    // Show form card directly
+    loginCard.classList.add("hidden");
+    formCard.classList.remove("hidden");
+    console.log("Login successful, session saved for 1 hr");
+  });
+});
+</script>
+
+  
 </body>
 </html>
