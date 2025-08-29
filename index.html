@@ -351,9 +351,9 @@
       submitBtn.disabled = true;
       startBtn.disabled = true;
 
-      let remaining = 60;
+      let remaining = 600;
       countdownEl.textContent = `(${remaining}s)`;
-      showToast("🕒 Please wait 60 seconds before submitting.", "info");
+      showToast("🕒 Please wait 600 seconds before submitting.", "info");
 
       const timer = setInterval(() => {
         remaining--;
