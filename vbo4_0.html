@@ -79,22 +79,11 @@
 
       <hr style="border:none; border-top:1px solid #e5e7eb; margin:12px 0;" />
 
-      <!-- Inputs (same fields) -->
-      <div class="row"><input type="text" name="jcname" required placeholder="Enter JC Name" /></div>
-      <div class="row">
-        <select name="wire" required>
-          <option value="">Select Wire</option><option>1 Core</option><option>2 Core</option><option>4 Core</option><option>6 Core</option><option>12 Core</option><option>96 Core</option>
-        </select>
-      </div>
-      <div class="row"><input type="number" name="vacantcores" required placeholder="Enter Vacant Cores" /></div>
-      <div class="row">
-        <select name="wirecolor">
-          <option value="">Select fiber color</option><option>Black</option><option>Orange</option><option>Other</option>
-        </select>
-      </div>
+      <!-- Inputs -->
+      <div class="row"><input type="text" name="jcname" placeholder="JC Name" /></div>
       <div class="row"><input type="text" name="linename" placeholder="Line Name (Optional)" /></div>
       <div class="row"><input type="text" name="drumno" placeholder="Drum No (Optional)" /></div>
-      <div class="row"><input type="text" name="remark" placeholder="Input power (मापें/नोट्स)" /></div>
+      <div class="row"><input type="text" name="power" placeholder="Power" /></div>
 
       <div class="row small-text muted">
        Flow: break → button click → wait for button active → join → wait and check users live
@@ -208,7 +197,7 @@ function escapeHtml(s){
 
 
 /* ========== Local form save/load ========== */
-const fieldsToSave = ['windowoption','jcname','wire','vacantcores','wirecolor','linename','drumno','remark'];
+const fieldsToSave = ['windowoption','jcname','linename','drumno','power'];
 function saveFormData() {
   const data = {};
   fieldsToSave.forEach(field => { const el = document.querySelector(`[name="${field}"]`); if (el) data[field] = el.value; });
@@ -431,6 +420,7 @@ function renderTable(win, pon, list){
         <th>Name</th>
         <th>Phone</th>
         <th>Address</th>
+        <th>PON No</th>
         <th>rxPower</th>
         <th>txPower</th>
         <th>Temperature</th>
@@ -445,6 +435,7 @@ function renderTable(win, pon, list){
       <td>${escapeHtml(u.name)}</td>
       <td>${escapeHtml(u.primary_phone)}</td>
       <td>${escapeHtml(u.address)}</td>
+      <td>${escapeHtml(ns.pon_number)}</td>
       <td>${escapeHtml(ns.rxPower)}</td>
       <td>${escapeHtml(ns.txPower)}</td>
       <td>${escapeHtml(ns.temperature)}</td>
@@ -460,12 +451,7 @@ async function runFinalFlow(){
   const win = document.querySelector('[name="windowoption"]').value;
   if(!win) { showToast("Select window", "error"); return; }
 
-  // validate inputs
   const form = document.getElementById('dataForm');
-  if(!form.jcname.value || !form.wire.value || !form.vacantcores.value){
-    showToast("Please fill required fields", "error");
-    return;
-  }
 
   setBtnDisabled(true, "Saving…");
   document.getElementById('tagStatus').textContent = "Preparing list & saving to database…";
@@ -482,13 +468,13 @@ async function runFinalFlow(){
       pon_number: pon || "",
       break_timestamp: breakTS || "",
       join_timestamp: joinTS || "",
-      jcname: form.jcname.value,
-      wire: form.wire.value,
-      vacantcores: form.vacantcores.value,
-      wirecolor: form.wirecolor.value || "",
+      jcname: form.jcname.value || "",
+      wire: "",
+      vacantcores: "",
+      wirecolor: "",
       linename: form.linename.value || "",
       drumno: form.drumno.value || "",
-      remark: form.remark.value || "",
+      remark: form.power.value || "",
       users: (list||[]).map(u=>({
         id: u.id,
         user_id: u.user_id,
